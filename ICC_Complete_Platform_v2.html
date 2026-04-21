@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICC Complete Code Compliance Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--blue:#185FA5;--bl:#E6F1FB;--bm:#B5D4F4;--bd:#0C447C;--green:#27500A;--gl:#EAF3DE;--gm:#C0DD97;--al:#FAEEDA;--am:#FAC775;--ad:#633806;--rl:#FCEBEB;--rm:#F09595;--rd:#791F1F;--purple:#4A35B5;--pl:#F0EEFF;--pm:#C4B8F8;--pd:#3D2B9E;--teal:#0D6E6E;--tl:#E0F5F5;--tm:#8CD9D9;--tx:#1a1a18;--tx2:#5F5E5A;--bdr:rgba(0,0,0,.10);--bg:#FDFCFA;--bg2:#F5F3EE;--bg3:#EDEBE4;--r:10px;--r2:6px;--f:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono',monospace}
+@media(prefers-color-scheme:dark){:root{--tx:#e8e6e0;--tx2:#a09e98;--bdr:rgba(255,255,255,.10);--bg:#151513;--bg2:#1e1e1c;--bg3:#282826;--bl:#0c2240;--gl:#0f2205;--al:#2a1f08;--rl:#2a0f0f;--pl:#1a1530;--tl:#0a2e2e}}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);line-height:1.6;min-height:100vh}
+.hdr{background:var(--bg2);border-bottom:.5px solid var(--bdr);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.logo{font-size:14px;font-weight:800;display:flex;align-items:center;gap:7px}
+.lm{width:22px;height:22px;border-radius:5px;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#fff}
+.hb{font-size:10px;background:var(--bl);color:var(--bd);padding:3px 9px;border-radius:100px;font-weight:700}
+.disc-bar{display:flex;gap:0;overflow-x:auto;border-bottom:.5px solid var(--bdr);background:var(--bg2);padding:0 12px;-webkit-overflow-scrolling:touch}
+.dt{padding:9px 14px;font-size:11px;font-weight:700;color:var(--tx2);cursor:pointer;white-space:nowrap;border-bottom:2.5px solid transparent;transition:all .12s;flex-shrink:0}
+.dt:hover{color:var(--tx);background:var(--bg)}
+.dt.active{color:var(--blue);border-bottom-color:var(--blue)}
+.dtl{display:block;font-size:9px;font-weight:500;color:var(--tx2);margin-top:1px}
+.container{max-width:760px;margin:0 auto;padding:16px 14px 50px}
+.pnl{display:none}.pnl.vis{display:block}
+.slbl{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2);margin-bottom:10px}
+/* Code picker */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:6px;margin-bottom:12px}
+.cp{border:.5px solid var(--bdr);border-radius:var(--r);padding:9px 5px;cursor:pointer;transition:all .12s;background:var(--bg);text-align:center}
+.cp:hover{background:var(--bg2);transform:translateY(-1px)}
+.cp.sel{border:2px solid var(--blue);background:var(--bl)}
+.cp.sg{border:2px solid var(--green);background:var(--gl)}
+.cp-e{font-size:11px;font-weight:800}.cp-y{font-size:19px;font-weight:800;margin:1px 0}.cp-t{font-size:9px;color:var(--tx2)}
+.cp.sel .cp-e,.cp.sel .cp-y{color:var(--blue)}
+.cp.sg .cp-e,.cp.sg .cp-y{color:var(--green)}
+/* Banner */
+.bnr{border-radius:var(--r2);padding:8px 12px;margin-bottom:12px;display:none}
+.bn-b{background:var(--bl);border:.5px solid var(--bm)}.bn-g{background:var(--gl);border:.5px solid var(--gm)}
+.bnt{font-size:12px;font-weight:700}.bn-b .bnt{color:var(--bd)}.bn-g .bnt{color:var(--green)}
+.bnn{font-size:11px;color:var(--tx2);margin-top:2px}
+/* Progress */
+.plbl{font-size:11px;color:var(--tx2);margin-bottom:4px;font-weight:500}
+.pbar{background:var(--bg3);border-radius:100px;height:5px;margin-bottom:14px;overflow:hidden}
+.pfill{height:5px;border-radius:100px;transition:width .4s;background:var(--blue)}
+/* Step cards */
+.sc{border:.5px solid var(--bdr);border-radius:var(--r);margin-bottom:10px;overflow:hidden;display:none;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.sc.ul{display:block}.sc.done{border-color:var(--gm)}
+.sh{display:flex;align-items:stretch}
+.sn{min-width:46px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;flex-shrink:0;background:var(--bg2);color:var(--tx2);font-family:var(--mono)}
+.sc.active .sn{background:var(--blue);color:#fff}
+.sc.done .sn{background:var(--gm);color:var(--green)}
+.sm{padding:10px 12px;flex:1;background:var(--bg2)}
+.sc.active .sm{background:var(--bl)}
+.sc.done .sm{background:var(--gl)}
+.stt{font-size:13px;font-weight:700}.str{font-size:10px;color:var(--tx2);margin-top:1px;font-family:var(--mono)}.sts{font-size:10px;font-weight:800;margin-top:1px;color:var(--tx2);text-transform:uppercase;letter-spacing:.03em}
+.sc.active .sts{color:var(--bd)}.sc.done .sts{color:var(--green)}
+.sb{padding:13px;background:var(--bg);display:none}
+.sc.active .sb,.sc.done .sb{display:block}
+/* Content */
+.qb{border-radius:var(--r2);padding:9px 12px;margin-bottom:9px}
+.qb-b{background:var(--bl)}.qb-g{background:var(--gl)}.qb-p{background:var(--pl)}.qb-t{background:var(--tl)}.qb-a{background:var(--al)}
+.ql{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.qb-b .ql{color:var(--bd)}.qb-g .ql{color:var(--green)}.qb-p .ql{color:var(--pd)}.qb-t .ql{color:var(--teal)}.qb-a .ql{color:var(--ad)}
+.qt{font-size:13px;line-height:1.6;font-weight:500}
+.bref{background:var(--bg2);border-radius:var(--r2);padding:8px 12px;margin-bottom:9px;border:.5px solid var(--bdr)}
+.brl{font-size:10px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.brt{font-size:11px;color:var(--tx2);line-height:1.7;padding-left:8px;border-left:2px solid var(--bdr);margin-top:2px}
+.ob{border-radius:var(--r2);padding:8px 11px;margin:6px 0;font-size:12px;line-height:1.55}
+.ob-pass{background:var(--gl);border:.5px solid var(--gm)}.ob-pass .obt{color:var(--green)}.ob-pass .obb{color:#3B6D11}
+.ob-fail{background:var(--rl);border:.5px solid var(--rm)}.ob-fail .obt{color:var(--rd)}.ob-fail .obb{color:#A32D2D}
+.ob-warn{background:var(--al);border:.5px solid var(--am)}.ob-warn .obt{color:var(--ad)}.ob-warn .obb{color:#854F0B}
+.ob-info{background:var(--bl);border:.5px solid var(--bm)}.ob-info .obt{color:var(--bd)}.ob-info .obb{color:var(--blue)}
+.ob-purp{background:var(--pl);border:.5px solid var(--pm)}.ob-purp .obt{color:var(--pd)}.ob-purp .obb{color:#4A35B5}
+.ob-teal{background:var(--tl);border:.5px solid var(--tm)}.ob-teal .obt{color:var(--teal)}.ob-teal .obb{color:#0D6E6E}
+.obt{font-size:12px;font-weight:700;margin-bottom:1px}.obb{font-size:12px;line-height:1.55}
+.altbox{border:1.5px dashed var(--am);border-radius:var(--r2);padding:9px 12px;margin:7px 0;background:var(--al)}
+.altt{font-size:12px;font-weight:800;color:var(--ad);margin-bottom:2px}.altb{font-size:12px;color:#854F0B;line-height:1.55}
+/* Tables */
+.tg{display:grid;gap:1px;background:var(--bdr);border:.5px solid var(--bdr);border-radius:var(--r2);overflow:hidden;margin:6px 0;font-size:11px}
+.tgh{display:flex;background:var(--bg2)}
+.tgr{display:flex;background:var(--bg)}
+.tgr.hi{background:var(--bl)}.tgr.gi{background:var(--gl)}.tgr.pi{background:var(--pl)}.tgr.ti{background:var(--tl)}
+.tgr.ok{background:var(--gl)}.tgr.bad{background:var(--rl)}.tgr.warn{background:var(--al)}
+.tgc{padding:5px 8px;flex:1;color:var(--tx2);font-size:11px}.tgr .tgc{color:var(--tx)}
+.b{font-weight:700}.pass{color:var(--green);font-weight:700}.fail{color:var(--rd);font-weight:700}.warn{color:var(--ad);font-weight:700}
+.w60{flex:0 0 60px}.w70{flex:0 0 70px}.w80{flex:0 0 80px}.w90{flex:0 0 90px}.w100{flex:0 0 100px}.w110{flex:0 0 110px}.w120{flex:0 0 120px}.w130{flex:0 0 130px}
+/* Nav */
+.navr{display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding-top:10px;border-top:.5px solid var(--bdr)}
+.btn{font-size:12px;padding:6px 14px;border-radius:var(--r2);border:.5px solid var(--bdr);background:var(--bg);color:var(--tx);cursor:pointer;font-family:var(--f);font-weight:600;transition:all .1s}
+.btn:hover{background:var(--bg2)}
+.btn-p{background:var(--blue);color:#fff;border-color:var(--blue)}.btn-p:hover{background:var(--bd)}
+.btn-g{background:var(--green);color:#fff;border-color:var(--green)}
+/* Inputs */
+select,input[type=number],input[type=text]{font-size:12px;padding:5px 8px;border-radius:var(--r2);border:.5px solid var(--bdr);background:var(--bg);color:var(--tx);font-family:var(--f)}
+input[type=number]{width:86px}input[type=text]{width:195px}select{min-width:128px}
+select:focus,input:focus{outline:none;box-shadow:0 0 0 2px var(--bm)}
+.irow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.ilbl{font-size:12px;color:var(--tx2);min-width:165px;flex-shrink:0;font-weight:500}
+.pigrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+@media(max-width:480px){.pigrid{grid-template-columns:1fr}.cgrid{grid-template-columns:repeat(3,1fr)}}
+.pif{display:flex;flex-direction:column;gap:2px}
+.pil{font-size:10px;color:var(--tx2);font-weight:700}
+/* Floor table */
+.ftbl{width:100%;border-collapse:collapse;font-size:11px;margin:6px 0}
+.ftbl th{background:var(--bg2);color:var(--tx2);font-weight:700;text-align:left;padding:5px 7px;border-bottom:.5px solid var(--bdr);white-space:nowrap;font-size:10px}
+.ftbl td{padding:4px 6px;border-bottom:.5px solid var(--bdr);vertical-align:middle}
+.ftbl tr:last-child td{border-bottom:none}
+.ftbl input[type=number]{width:72px;padding:3px 5px}
+.ftbl select{min-width:140px;padding:3px 5px}
+.fn{font-weight:700;font-size:11px;white-space:nowrap}
+.fb{display:inline-block;font-size:9px;font-weight:800;padding:2px 5px;border-radius:3px}
+.fb-B{background:var(--bm);color:var(--bd)}.fb-A2,.fb-A3{background:#F5C4B3;color:#712B13}.fb-M{background:var(--am);color:var(--ad)}.fb-R2{background:#9FE1CB;color:#085041}.fb-S1,.fb-S2{background:#D3D1C7;color:#444}.fb-E{background:var(--gm);color:var(--green)}.fb-P{background:var(--pm);color:var(--pd)}
+.addrow{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+/* Summary */
+.sumcard{background:var(--bg);border:.5px solid var(--bdr);border-radius:var(--r);padding:16px;margin-top:10px;display:none;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.sumtitle{font-size:16px;font-weight:800;margin-bottom:10px}
+.srow{display:flex;align-items:baseline;gap:6px;padding:4px 0;border-bottom:.5px solid var(--bdr);font-size:11px}
+.srow:last-child{border-bottom:none}
+.slbl{color:var(--tx2);min-width:195px;flex-shrink:0;font-weight:500}.sval{font-weight:700;flex:1}.sref{font-size:10px;color:var(--tx2);font-family:var(--mono)}
+.footer{background:var(--bg2);border-top:.5px solid var(--bdr);padding:16px;text-align:center;font-size:10px;color:var(--tx2);margin-top:30px}
+</style>
+</head>
+<body>
+<header class="hdr"><div class="logo"><div class="lm">ICC</div>Complete Code Platform</div><span class="hb">2015–2021 + DFW</span></header>
+<nav class="disc-bar" id="disc-bar">
+  <div class="dt active" onclick="sw('bldg')" id="dt-bldg">Building<span class="dtl">IBC · IRC</span></div>
+  <div class="dt" onclick="sw('fire')" id="dt-fire">Fire<span class="dtl">§903 · Alternates</span></div>
+  <div class="dt" onclick="sw('egress')" id="dt-egress">Egress<span class="dtl">Exits · Stairs</span></div>
+  <div class="dt" onclick="sw('elev')" id="dt-elev">Elevator<span class="dtl">ASME · ADA</span></div>
+  <div class="dt" onclick="sw('ada')" id="dt-ada">ADA/TAS<span class="dtl">Accessibility</span></div>
+  <div class="dt" onclick="sw('mep')" id="dt-mep">MEP<span class="dtl">IMC·IPC·NEC</span></div>
+  <div class="dt" onclick="sw('energy')" id="dt-energy">Energy<span class="dtl">IECC·90.1</span></div>
+  <div class="dt" onclick="sw('dfw')" id="dt-dfw">DFW Airport<span class="dtl">DCM Overlay</span></div>
+</nav>
+<div class="container">
+
+<!-- ═══ BUILDING PANEL ═══ -->
+<div class="pnl vis" id="p-bldg">
+<div class="slbl">Step 1 — Select code edition and define every floor</div>
+<div class="cgrid">
+  <div class="cp" id="cb-IBC2021" onclick="pickCode('IBC2021')"><div class="cp-e">IBC</div><div class="cp-y">2021</div><div class="cp-t">Building</div></div>
+  <div class="cp" id="cb-IBC2018" onclick="pickCode('IBC2018')"><div class="cp-e">IBC</div><div class="cp-y">2018</div><div class="cp-t">Building</div></div>
+  <div class="cp" id="cb-IBC2015" onclick="pickCode('IBC2015')"><div class="cp-e">IBC</div><div class="cp-y">2015</div><div class="cp-t">Building</div></div>
+  <div class="cp" id="cb-IRC2021" onclick="pickCode('IRC2021')"><div class="cp-e">IRC</div><div class="cp-y">2021</div><div class="cp-t">Residential</div></div>
+  <div class="cp" id="cb-IRC2018" onclick="pickCode('IRC2018')"><div class="cp-e">IRC</div><div class="cp-y">2018</div><div class="cp-t">Residential</div></div>
+  <div class="cp" id="cb-IRC2015" onclick="pickCode('IRC2015')"><div class="cp-e">IRC</div><div class="cp-y">2015</div><div class="cp-t">Residential</div></div>
+</div>
+<div class="bnr bn-b" id="bnr-b"><div class="bnt" id="bnt-b"></div><div class="bnn" id="bnn-b"></div></div>
+<div class="bnr bn-g" id="bnr-g"><div class="bnt" id="bnt-g"></div><div class="bnn" id="bnn-g"></div></div>
+<div id="bldg-wb">
+  <div class="ob ob-info"><div class="obt">Select a code edition above to begin</div><div class="obb">Choose IBC 2015, 2018, or 2021 for commercial buildings — or IRC 2015, 2018, or 2021 for residential. The workbook adapts all steps to the selected edition. Your project inputs carry forward to the Fire, Egress, Elevator, ADA, MEP, and Energy tabs automatically.</div></div>
+</div>
+</div>
+
+<!-- ═══ FIRE PANEL ═══ -->
+<div class="pnl" id="p-fire"></div>
+<!-- ═══ EGRESS PANEL ═══ -->
+<div class="pnl" id="p-egress"></div>
+<!-- ═══ ELEVATOR PANEL ═══ -->
+<div class="pnl" id="p-elev"></div>
+<!-- ═══ ADA PANEL ═══ -->
+<div class="pnl" id="p-ada"></div>
+<!-- ═══ MEP PANEL ═══ -->
+<div class="pnl" id="p-mep"></div>
+<!-- ═══ ENERGY PANEL ═══ -->
+<div class="pnl" id="p-energy"></div>
+<!-- ═══ DFW PANEL ═══ -->
+<div class="pnl" id="p-dfw"></div>
+
+</div>
+<footer class="footer">ICC Complete Code Platform · For reference only — verify with your local building official and licensed professionals.<br>IBC/IRC/IMC/IPC/IECC © ICC. ADA Standards © US DOJ. TAS © TDLR. ASME A17.1 © ASME. NEC © NFPA.</footer>
+
+<script>
+/* ═══ GLOBAL STATE ═══ */
+var S={code:'',floors:[],ctype:'',spr:true,occLoads:[],projName:'',projCity:'',done:[],
+  ircStories:2,ircArea:2400,ircBeds:3,ircBaths:2,ircBasement:false,ircGarage:false,ircType:'sfr',
+  isDFW:false};
+var isIRC=false;
+
+/* ═══ USE DATA ═══ */
+var UD={
+  B:{l:'Office / business',g:'Group B',lf:150,lt:'gross',tdS:300,tdN:200,cpS:100,cpN:75,el1:49,el2:29,ll:50,aT:12000,hT:1,s3:1},
+  A2:{l:'Restaurant / bar',g:'Group A-2',lf:15,lt:'net',tdS:250,tdN:150,cpS:70,cpN:70,el1:49,el2:49,ll:100,aT:5000,hT:0,s3:0},
+  A3:{l:'Assembly — other',g:'Group A-3',lf:15,lt:'net',tdS:250,tdN:150,cpS:70,cpN:70,el1:49,el2:49,ll:100,aT:12000,hT:0,s3:0},
+  M:{l:'Retail / mercantile',g:'Group M',lf:60,lt:'gross',tdS:250,tdN:150,cpS:75,cpN:75,el1:49,el2:49,ll:100,aT:12000,hT:1,s3:1},
+  R2:{l:'Apartments / multi-family',g:'Group R-2',lf:200,lt:'gross',tdS:250,tdN:125,cpS:125,cpN:75,el1:10,el2:10,ll:40,aT:0,hT:0,s3:0},
+  S1:{l:'Storage — moderate',g:'Group S-1',lf:300,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:125,aT:12000,hT:1,s3:1},
+  S2:{l:'Storage — low hazard',g:'Group S-2',lf:500,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:125,aT:12000,hT:1,s3:1},
+  E:{l:'School / classroom',g:'Group E',lf:20,lt:'net',tdS:250,tdN:150,cpS:75,cpN:75,el1:49,el2:49,ll:40,aT:12000,hT:1,s3:1},
+  P:{l:'Parking / mechanical',g:'Utility',lf:500,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:40,aT:12000,hT:1,s3:1}
+};
+var CT={
+  IIB:{n:'Type II-B',fr:'0 hrs',maxS:{B:4,A2:2,A3:2,M:4,R2:4,S1:2,S2:3,E:2,P:8},bA:{B:9500,A2:9500,A3:9500,M:12500,R2:24000,S1:17500,S2:26000,E:14000,P:18000}},
+  IIA:{n:'Type II-A',fr:'1 hr',maxS:{B:6,A2:3,A3:3,M:5,R2:6,S1:3,S2:4,E:3,P:10},bA:{B:14000,A2:14000,A3:14000,M:17500,R2:24000,S1:26000,S2:26000,E:23500,P:18000}},
+  IB:{n:'Type I-B',fr:'2 hrs',maxS:{B:11,A2:11,A3:11,M:11,R2:11,S1:7,S2:8,E:5,P:12},bA:{B:37500,A2:37500,A3:37500,M:37500,R2:37500,S1:26000,S2:26000,E:62500,P:37500}},
+  IA:{n:'Type I-A',fr:'3 hrs',maxS:{B:999,A2:999,A3:999,M:999,R2:999,S1:999,S2:999,E:5,P:999},bA:{B:55000,A2:55000,A3:55000,M:55000,R2:55000,S1:37500,S2:37500,E:80500,P:55000}},
+  VB:{n:'Type V-B',fr:'0 hrs',maxS:{B:2,A2:1,A3:1,M:2,R2:2,S1:1,S2:1,E:1,P:1},bA:{B:9000,A2:6000,A3:6000,M:9000,R2:7000,S1:17000,S2:26000,E:9500,P:9000}},
+  VA:{n:'Type V-A',fr:'1 hr',maxS:{B:3,A2:2,A3:2,M:3,R2:3,S1:2,S2:2,E:2,P:2},bA:{B:14000,A2:11500,A3:11500,M:14000,R2:12000,S1:26000,S2:26000,E:23500,P:14000}},
+  IIIB:{n:'Type III-B',fr:'0 hrs int',maxS:{B:4,A2:2,A3:2,M:4,R2:4,S1:3,S2:4,E:2,P:4},bA:{B:12000,A2:12000,A3:12000,M:18500,R2:18000,S1:17500,S2:26000,E:23500,P:12000}},
+  IIIA:{n:'Type III-A',fr:'1 hr int',maxS:{B:6,A2:3,A3:3,M:5,R2:6,S1:3,S2:4,E:3,P:6},bA:{B:18000,A2:18000,A3:18000,M:25500,R2:24000,S1:26000,S2:26000,E:23500,P:18000}}
+};
+var llMap={B:50,A2:100,A3:100,M:100,R2:40,S1:125,S2:125,E:40,P:40};
+var sepT={'B/A2':'2/1','B/A3':'2/1','B/M':'NR/NR','B/R2':'2/1','B/S1':'2/1','B/S2':'1/NR','B/E':'NR/NR','B/P':'1/NR','A2/A3':'NR/NR','A2/M':'1/1','A2/R2':'2/1','A2/S1':'2/1','A2/S2':'2/1','A2/E':'2/1','A2/P':'2/1','A3/M':'1/1','A3/R2':'2/1','A3/S1':'2/1','A3/S2':'2/1','A3/E':'NR/NR','A3/P':'2/1','M/R2':'2/1','M/S1':'2/1','M/S2':'1/NR','M/E':'NR/NR','M/P':'1/NR','R2/S1':'2/1','R2/S2':'2/1','R2/E':'2/1','R2/P':'2/1','S1/S2':'NR/NR','S1/E':'2/1','S1/P':'1/NR','S2/E':'2/1','S2/P':'1/NR','E/P':'1/NR'};
+function getSep(a,b,s){if(a===b)return'NR';var k=a+'/'+b,k2=b+'/'+a,v=sepT[k]||sepT[k2]||'2/1';return s?v.split('/')[1]:v.split('/')[0];}
+
+/* ═══ DISCIPLINE SWITCHING ═══ */
+function sw(id){
+  document.querySelectorAll('.dt').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('dt-'+id).classList.add('active');
+  document.querySelectorAll('.pnl').forEach(function(p){p.classList.remove('vis')});
+  document.getElementById('p-'+id).classList.add('vis');
+  if(!loaded[id]){loadPanel(id);loaded[id]=true;}
+}
+var loaded={bldg:true};
+
+/* ═══ CODE PICKER ═══ */
+function pickCode(c){
+  S.code=c;isIRC=c.startsWith('IRC');
+  document.querySelectorAll('#p-bldg .cp').forEach(function(e){e.classList.remove('sel','sg')});
+  document.getElementById('cb-'+c).classList.add(isIRC?'sg':'sel');
+  document.getElementById('bnr-b').style.display=isIRC?'none':'block';
+  document.getElementById('bnr-g').style.display=isIRC?'block':'none';
+  if(!isIRC){var yr=c.replace('IBC','');document.getElementById('bnt-b').textContent='IBC '+yr+' selected';document.getElementById('bnn-b').textContent='All 10 steps will reference IBC '+yr+' sections and tables.';}
+  else{var yr=c.replace('IRC','');document.getElementById('bnt-g').textContent='IRC '+yr+' selected';document.getElementById('bnn-g').textContent='All 10 steps will follow IRC '+yr+' prescriptive requirements.';}
+  buildBldgWB();
+}
+
+/* ═══ BUILD THE 10-STEP BUILDING WORKBOOK ═══ */
+function buildBldgWB(){
+  var yr=S.code.replace('IBC','').replace('IRC','');
+  var wb=document.getElementById('bldg-wb');
+  var h='<div class="plbl" id="bplbl">Step 1 of 10</div><div class="pbar"><div class="pfill" id="bpfill" style="width:10%"></div></div>';
+  var stepTitles,stepRefs;
+  if(!isIRC){
+    stepTitles=['Project info & floor schedule','Construction type — Table 601','Height & area check — Tables 504.3, 506.2','Sprinkler triggers — §903.2','Occupant load — Table 1004.5','Exits per floor — §1006 & Table 1006.3.4','Travel distance & common path — Table 1017.2','Fire separations — Table 508.4','Structural live loads — Table 1607.1','Special inspections — §1705'];
+    stepRefs=['IBC '+yr+' §202 · Ch.3 · §303–§312','Ch.6 · §601 · Table 601','§503 · §504 · §506 · §506.3','§903.2 · §903.3.1.1','§1004 · Table 1004.5','§1006 · Table 1006.3.4 · §1005.1','§1006.2.1 · §1017 · Table 1017.2','§508.4 · Table 508.4 · §707 · §711','§1602 · §1607 · Table 1607.1 · Table 1607.8','§1701–§1709 · §1705.2–§1705.18'];
+  } else {
+    stepTitles=['Dwelling info','Framing — Chapter 6','Room sizes & ceiling heights — §R303–R305','Smoke/CO alarms & sprinklers — §R314–R316','Emergency escape — §R310','Stairways — §R311.7','Guards — §R312','Plumbing & electrical — Ch.26–Ch.39','Energy — Ch.11 / IECC','Foundation — §R401–R408'];
+    stepRefs=['IRC '+yr+' §R101.2 · §R201 · §R301','§R601 · §R602 · §R802','§R303 · §R304 · §R305','§R314 · §R315 · §R313','§R310 · §R311','§R311.7','§R312','§P2705 · §E3902','§N1101 · Table N1102.1.2','§R401 · §R403 · §R405'];
+  }
+  for(var i=0;i<10;i++){
+    var n=i+1;
+    var cls=n===1?'sc ul active':'sc';
+    var sts=n===1?'In progress':'Locked';
+    var stscls=n===1?'sts':'sts';
+    h+='<div class="'+cls+'" id="bsc'+n+'"><div class="sh"><div class="sn" id="bsn'+n+'">'+n+'</div><div class="sm"><div class="stt">'+stepTitles[i]+'</div><div class="str">'+stepRefs[i]+'</div><div class="sts" id="bss'+n+'">'+sts+'</div></div></div><div class="sb" id="bsb'+n+'"></div></div>';
+  }
+  h+='<div class="sumcard" id="bsum"><div class="sumtitle" id="bsumtitle">Compliance Summary</div><div id="bsumcontent"></div><div style="margin-top:10px"><button class="btn" onclick="resetBldg()">Start over →</button></div></div>';
+  wb.innerHTML=h;
+  renderStep(1);
+}
+
+/* ═══ RENDER EACH IBC STEP ═══ */
+function renderStep(n){
+  var el=document.getElementById('bsb'+n);if(!el)return;
+  if(isIRC){renderIRCStep(n);return;}
+  var yr=S.code.replace('IBC','');
+  if(n===1){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">What is the project, what happens on each floor, how large is each floor, and how high above grade is each floor?</div></div>'+
+    '<div class="bref"><div class="brl">How to use §202 and Chapter 3</div><div class="brt">§202 defines "story above grade plane" and "gross floor area." Chapter 3 §302.1 requires every building to be classified by occupancy group. Each floor gets its own occupancy group if its use differs. Height above grade feeds the §903.2.1.1 sprinkler trigger (55 ft threshold).</div></div>'+
+    '<div class="pigrid"><div class="pif"><span class="pil">Project name</span><input type="text" id="pname" placeholder="e.g. Main Street Office" oninput="S.projName=this.value"></div><div class="pif"><span class="pil">City / state</span><input type="text" id="pcity" placeholder="e.g. Dallas, TX" oninput="S.projCity=this.value"></div></div>'+
+    '<div class="irow"><span class="ilbl">Is this a DFW Airport project?</span><select id="isDFW" onchange="S.isDFW=this.value===\'yes\'"><option value="no">No</option><option value="yes">Yes — DFW Airport DCM applies</option></select></div>'+
+    '<div style="font-size:13px;font-weight:700;margin:10px 0 6px">Floor schedule</div>'+
+    '<div style="overflow-x:auto"><table class="ftbl"><thead><tr><th>Level</th><th>Occupancy use</th><th>Gross area (sf)</th><th>Ht above grade (ft)</th><th>Group</th></tr></thead><tbody id="ftbody"></tbody></table></div>'+
+    '<div class="addrow"><button class="btn" onclick="addFloor()">+ Add floor</button><button class="btn" id="brmfl" onclick="rmFloor()">− Remove</button><span style="font-size:10px;color:var(--tx2)" id="flcnt"></span></div>'+
+    '<div id="flwarn" style="margin-top:6px"></div>'+
+    '<div class="navr"><span></span><button class="btn btn-p" onclick="bDone(1)">Confirm & continue →</button></div>';
+    renderFT();
+  } else if(n===2){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">What material is the structure built from and are its elements fire-protected? This determines the fire-resistance hour requirements and controls the maximum height and area in Step 3.</div></div>'+
+    '<div class="bref"><div class="brl">How to read Table 601</div><div class="brt">Rows = structural elements (frame, walls, floors, roof). Columns = construction types. Find your column, read hours per element. "0" = no rating required. Types I–II = non-combustible. Types III–V = combustible. Sub-type A = fire-protected; B = unprotected.</div></div>'+
+    '<div class="irow"><span class="ilbl">Construction type</span><select id="bctype" onchange="S.ctype=this.value;showCT()"><option value="">— select —</option>'+Object.keys(CT).map(function(k){return'<option value="'+k+'">'+CT[k].n+' — '+CT[k].fr+'</option>';}).join('')+'</select></div>'+
+    '<div id="ctout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(2)">← Back</button><button class="btn btn-p" onclick="bDone(2)">Confirm & continue →</button></div>';
+  } else if(n===3){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">Is the building within the allowable story count and floor area limits for the most restrictive occupancy group and the chosen construction type?</div></div>'+
+    '<div class="bref"><div class="brl">Tables 504.3, 506.2</div><div class="brt">Table 504.3 = max stories. Table 506.2 = max area per story. Find row for most restrictive occupancy group, column for construction type. §506.3: multiply by 3 with NFPA 13 sprinklers.</div></div>'+
+    '<div id="haout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(3)">← Back</button><button class="btn btn-p" onclick="bDone(3)">Confirm & continue →</button></div>';
+    runHA();
+  } else if(n===4){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">Does ANY §903.2 condition require automatic sprinklers? One satisfied trigger = NFPA 13 required throughout.</div></div>'+
+    '<div class="bref"><div class="brl">§903.2 checklist</div><div class="brt">§903.2.1.1 — floor >55 ft? §903.2.1.2 — 3+ stories or assembly above exit discharge? §903.2.1.3 — fire area over threshold? §903.2.8 — R-2 with 4+ stories? One "yes" triggers NFPA 13 throughout.</div></div>'+
+    '<div id="sprout"></div>'+
+    '<div class="irow" style="margin-top:8px"><span class="ilbl">Will you install sprinklers?</span><select id="bspr" onchange="S.spr=this.value===\'yes\'"><option value="yes">Yes — NFPA 13</option><option value="no">No — sprinkler-free</option></select></div>'+
+    '<div id="sprcho"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(4)">← Back</button><button class="btn btn-p" onclick="bDone(4)">Confirm & continue →</button></div>';
+    runSpr();
+  } else if(n===5){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">How many people does the IBC assume occupy each floor? This drives exit count, exit width, and plumbing fixture counts.</div></div>'+
+    '<div class="bref"><div class="brl">Table 1004.5</div><div class="brt">Find function in left column, read load factor (gross or net sf/person). Divide floor area by factor (round up). Business = 150, Assembly standing = 5, Assembly tables = 15, Retail = 60, Residential = 200.</div></div>'+
+    '<div id="occout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(5)">← Back</button><button class="btn btn-p" onclick="bDone(5)">Confirm & continue →</button></div>';
+    runOcc();
+  } else if(n===6){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">How many separate exits must each floor have, and how wide must each exit component be?</div></div>'+
+    '<div class="bref"><div class="brl">§1006 and Table 1006.3.4</div><div class="brt">Default = 2 exits. ONE exit permitted when BOTH occupant count AND common path are below table values. §1005.1: door/corridor = 0.15 in × occupants (min 32"). Stair = 0.2 in × occupants (min 44" for 50+ occ, 36" for ≤50).</div></div>'+
+    '<div id="exitout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(6)">← Back</button><button class="btn btn-p" onclick="bDone(6)">Confirm & continue →</button></div>';
+    runExit();
+  } else if(n===7){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">What is the maximum walking distance from the most remote point to the nearest exit? This governs corridor layout and exit placement.</div></div>'+
+    '<div class="bref"><div class="brl">Table 1017.2 and §1006.2.1</div><div class="brt">Find occupancy group row. Read sprinklered or unsprinklered column. Common path = single-direction portion before path branches. Dead-end corridors: 20 ft (50 ft sprinklered) per §1020.4.</div></div>'+
+    '<div id="tdout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(7)">← Back</button><button class="btn btn-p" onclick="bDone(7)">Confirm & continue →</button></div>';
+    runTD();
+  } else if(n===8){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">Where two different occupancy groups meet, what fire-resistance rating is required at the boundary?</div></div>'+
+    '<div class="bref"><div class="brl">Table 508.4</div><div class="brt">Grid: rows and columns = occupancy groups. Cell value: NR / 1-hr / 2-hr. Two values shown: (without sprinklers / with sprinklers). §707 governs walls; §711 governs horizontal assemblies between stacked groups.</div></div>'+
+    '<div id="sepout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(8)">← Back</button><button class="btn btn-p" onclick="bDone(8)">Confirm & continue →</button></div>';
+    runSep();
+  } else if(n===9){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">What minimum live load in PSF must the structural engineer design each floor and roof to carry?</div></div>'+
+    '<div class="bref"><div class="brl">Table 1607.1 and Table 1607.8</div><div class="brt">Left column = use, right column = PSF. Key: Office = 50, Lobbies = 100, Assembly standing = 100, Retail = 100, Residential = 40, Roof maintenance = 20, Stairs = 100. Guardrails: 200 lb concentrated + 50 lb/ft at top per Table 1607.8.</div></div>'+
+    '<div id="loadout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(9)">← Back</button><button class="btn btn-p" onclick="bDone(9)">Confirm & continue →</button></div>';
+    runLoad();
+  } else if(n===10){
+    el.innerHTML='<div class="qb qb-b"><div class="ql">IBC '+yr+' question</div><div class="qt">Which construction work types require an independent approved agency to observe and certify?</div></div>'+
+    '<div class="bref"><div class="brl">§1705</div><div class="brt">Each §1705 subsection covers one work type. "Continuous" = inspector present throughout. "Periodic" = scheduled visits. The architect lists all applicable §1705 items on the cover sheet. The owner hires the approved agency before work begins.</div></div>'+
+    '<div id="siout"></div>'+
+    '<div class="navr"><button class="btn" onclick="bBack(10)">← Back</button><button class="btn btn-p" onclick="bDone(10)">Finish — view summary →</button></div>';
+    runSI();
+  }
+}
+
+/* ═══ FLOOR TABLE ═══ */
+function floorLabel(i){return['1st floor (grade)','2nd floor','3rd floor','4th floor','5th floor','6th floor','7th floor','8th floor','9th floor'][i]||'Floor '+(i+1);}
+function renderFT(){
+  var f=S.floors,h='';
+  if(!f.length)h='<tr><td colspan="5" style="text-align:center;padding:12px;color:var(--tx2);font-size:12px">No floors — click "+ Add floor"</td></tr>';
+  else f.forEach(function(fl,i){
+    h+='<tr><td><span class="fn">'+floorLabel(i)+'</span></td><td><select onchange="S.floors['+i+'].use=this.value;renderFT()">';
+    Object.keys(UD).forEach(function(u){h+='<option value="'+u+'"'+(fl.use===u?' selected':'')+'>'+UD[u].l+'</option>';});
+    h+='</select></td><td><input type="number" min="100" max="80000" value="'+fl.area+'" onchange="S.floors['+i+'].area=Math.max(100,+this.value||500)"></td><td><input type="number" min="0" max="800" value="'+fl.ht+'" onchange="S.floors['+i+'].ht=Math.max(0,+this.value||0)"></td><td><span class="fb fb-'+fl.use+'">'+fl.use+'</span></td></tr>';
+  });
+  document.getElementById('ftbody').innerHTML=h;
+  document.getElementById('flcnt').textContent=f.length+' floor'+(f.length!==1?'s':'');
+  document.getElementById('brmfl').disabled=f.length<1;
+}
+function addFloor(){if(S.floors.length>=9)return;var n=S.floors.length,ph=n>0?S.floors[n-1].ht:0,pu=n>0?S.floors[n-1].use:'B';S.floors.push({use:pu,area:2500,ht:ph+(n===0?0:14)});renderFT();}
+function rmFloor(){if(S.floors.length>0){S.floors.pop();renderFT();}}
+
+/* ═══ IBC CALCULATION FUNCTIONS ═══ */
+function getMR(){var pr=['A2','A3','R2','E','M','S1','S2','B','P'],gs=S.floors.map(function(f){return f.use;});for(var i=0;i<pr.length;i++)if(gs.indexOf(pr[i])>=0)return pr[i];return gs[0]||'B';}
+function showCT(){var c=S.ctype;if(!c||!CT[c])return;document.getElementById('ctout').innerHTML='<div class="ob ob-info"><div class="obt">'+CT[c].n+' — '+CT[c].fr+' fire-resistance</div><div class="obb">This sets the maximum stories and area per floor in Step 3. All structural elements must meet the Table 601 fire-resistance hours for this type.</div></div>';}
+function runHA(){
+  if(!S.ctype||!S.floors.length){document.getElementById('haout').innerHTML='<div class="ob ob-warn"><div class="obb">Complete Steps 1–2 first.</div></div>';return;}
+  var mr=getMR(),ct=CT[S.ctype],n=S.floors.length,maxS=ct.maxS[mr]||2,bA=ct.bA[mr]||9000,sA=bA*3,lg=Math.max.apply(null,S.floors.map(function(f){return f.area;}));
+  var stOk=maxS>=999||n<=maxS,aOkN=lg<=bA,aOkS=lg<=sA;
+  var h='<div class="tg"><div class="tgh"><div class="tgc b">Check</div><div class="tgc b w120">Limit</div><div class="tgc b w90">Building</div><div class="tgc b w70">Result</div></div>';
+  h+='<div class="tgr '+(stOk?'ok':'bad')+'"><div class="tgc">Max stories — '+ct.n+' / '+UD[mr].g+'</div><div class="tgc w120">'+(maxS>=999?'Unlimited':maxS)+'</div><div class="tgc w90">'+n+'</div><div class="tgc w70 '+(stOk?'pass':'fail')+'">'+(stOk?'Pass':'FAIL')+'</div></div>';
+  h+='<div class="tgr '+(aOkN?'ok':'warn')+'"><div class="tgc">Max area/floor unsprinklered</div><div class="tgc w120">'+bA.toLocaleString()+' sf</div><div class="tgc w90">'+lg.toLocaleString()+' sf</div><div class="tgc w70 '+(aOkN?'pass':'warn')+'">'+(aOkN?'Pass':'Over')+'</div></div>';
+  h+='<div class="tgr '+(aOkS?'ok':'bad')+'"><div class="tgc">Max area/floor sprinklered (×3)</div><div class="tgc w120">'+sA.toLocaleString()+' sf</div><div class="tgc w90">'+lg.toLocaleString()+' sf</div><div class="tgc w70 '+(aOkS?'pass':'fail')+'">'+(aOkS?'Pass':'FAIL')+'</div></div></div>';
+  if(!stOk)h+='<div class="ob ob-fail"><div class="obt">Story count exceeds limit</div><div class="obb">Reduce floors to '+maxS+', upgrade construction type, or change the most restrictive occupancy.</div></div>';
+  else if(!aOkN&&aOkS)h+='<div class="ob ob-warn"><div class="obt">Area exceeds unsprinklered limit — sprinklers needed</div><div class="obb">Largest floor '+lg.toLocaleString()+' sf > '+bA.toLocaleString()+' sf. With NFPA 13 → '+sA.toLocaleString()+' sf.</div></div>';
+  else if(stOk&&aOkN)h+='<div class="ob ob-pass"><div class="obt">Within height and area limits</div><div class="obb">'+n+' stories ≤ '+maxS+'. Largest floor '+lg.toLocaleString()+' sf ≤ '+bA.toLocaleString()+' sf.</div></div>';
+  h+='<div class="altbox"><div class="altt">💰 Alternates to change height/area outcome</div><div class="altb"><strong>Upgrade construction type</strong> (e.g. II-B → II-A): gains 2 more stories and ~50% more area per floor. Cost: fire-resistant coatings on steel + rated assemblies.<br><strong>Add sprinklers</strong>: triples allowable area per §506.3 — often the cheapest way to unlock a larger floor plate.<br><strong>Reduce floor count</strong>: if 1 story over the limit, consider increasing footprint instead of height.</div></div>';
+  document.getElementById('haout').innerHTML=h;
+}
+function runSpr(){
+  var f=S.floors,n=f.length,t=[];
+  if(f.some(function(fl){return UD[fl.use].hT&&fl.ht>55;}))t.push({t:'Floor >55 ft — §903.2.1.1',v:1});
+  if(f.some(function(fl){return UD[fl.use].s3&&n>=3;}))t.push({t:'3+ stories — §903.2.1.2',v:1});
+  if(f.some(function(fl,i){return(fl.use==='A2'||fl.use==='A3')&&i>0;}))t.push({t:'Assembly above grade — §903.2.1.2',v:1});
+  if(f.some(function(fl){return UD[fl.use].aT>0&&fl.area>UD[fl.use].aT;}))t.push({t:'Fire area exceeds threshold — §903.2.1.3',v:1});
+  if(f.some(function(fl){return fl.use==='R2'&&n>=4;}))t.push({t:'R-2 with 4+ stories — §903.2.8',v:1});
+  if(!t.length)t.push({t:'No base IBC trigger found',v:0});
+  var req=t.some(function(x){return x.v;});
+  var h='<div class="tg"><div class="tgh"><div class="tgc b">§903.2 trigger</div><div class="tgc b w90">Required?</div></div>';
+  t.forEach(function(x){h+='<div class="tgr '+(x.v?'bad':'ok')+'"><div class="tgc">'+x.t+'</div><div class="tgc w90 '+(x.v?'fail':'pass')+'">'+(x.v?'YES':'No')+'</div></div>';});
+  h+='</div>';
+  h+=req?'<div class="ob ob-fail"><div class="obt">Sprinklers required — NFPA 13 throughout</div><div class="obb">At least one §903.2 condition is met.</div></div>':'<div class="ob ob-warn"><div class="obt">No base IBC trigger — verify local amendments</div><div class="obb">Confirm with local building official and fire marshal in writing.</div></div>';
+  h+='<div class="altbox"><div class="altt">💰 Sprinkler budget alternates</div><div class="altb"><strong>NFPA 13R instead of 13</strong> (R occupancies ≤4 stories): saves 30–40%. No sprinklers in attics, closets, small bathrooms.<br><strong>Reduce below trigger thresholds</strong>: each floor under 12,000 sf (Group B) + ≤2 stories = no trigger.<br><strong>Fire area subdivision</strong> with fire walls (§706): divide large floor into smaller fire areas below threshold.</div></div>';
+  document.getElementById('sprout').innerHTML=h;
+}
+function runOcc(){
+  var f=S.floors,loads=[],h='<div class="tg"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w60">Group</div><div class="tgc b">Area</div><div class="tgc b w100">Factor</div><div class="tgc b w80">Occupants</div></div>';
+  f.forEach(function(fl,i){var u=UD[fl.use],o=Math.ceil(fl.area/u.lf);loads.push(o);h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w60">'+fl.use+'</div><div class="tgc">'+fl.area.toLocaleString()+' sf</div><div class="tgc w100">'+u.lf+' '+u.lt+'</div><div class="tgc w80 b pass">'+o+'</div></div>';});
+  h+='</div>';var tot=loads.reduce(function(a,b){return a+b;},0);
+  h+='<div class="ob ob-info"><div class="obt">Total: '+tot+' persons</div><div class="obb">Used for exits (Step 6), plumbing fixtures (MEP tab), and ventilation (MEP tab).</div></div>';
+  document.getElementById('occout').innerHTML=h;S.occLoads=loads;
+}
+function runExit(){
+  var f=S.floors,sp=S.spr,h='<div class="tg"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w70">Occ</div><div class="tgc b w90">1-exit lim</div><div class="tgc b w90">Exits</div><div class="tgc b w80">Min width</div></div>';
+  f.forEach(function(fl,i){var u=UD[fl.use],o=S.occLoads[i]||Math.ceil(fl.area/u.lf),lim=i===0?(sp?u.el1:Math.floor(u.el1*.65)):(sp?u.el2:Math.floor(u.el2*.65)),ex=o>lim?2:1,mw=Math.max(32,Math.ceil(o*.15));
+  h+='<div class="tgr '+(ex===1?'ok':'warn')+'"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w70">'+o+'</div><div class="tgc w90">'+lim+'</div><div class="tgc w90 '+(ex===1?'pass':'warn b')+'">'+ex+' exit'+(ex>1?'s':'')+'</div><div class="tgc w80">'+mw+'"</div></div>';});
+  h+='</div>';
+  h+='<div class="altbox"><div class="altt">💰 Exit alternates</div><div class="altb"><strong>Single exit</strong> (B, sprinklered, ≤49 occ per floor): eliminates second stairway — saves $15K–$40K.<br><strong>Exterior stair</strong> (§1027): no shaft enclosure needed — saves $10K–$25K vs enclosed stair.</div></div>';
+  document.getElementById('exitout').innerHTML=h;
+}
+function runTD(){
+  var f=S.floors,sp=S.spr,h='<div class="tg"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w60">Group</div><div class="tgc b w100">Max travel</div><div class="tgc b w100">Max common</div><div class="tgc b w80">Dead-end</div></div>';
+  f.forEach(function(fl,i){var u=UD[fl.use],td=sp?u.tdS:u.tdN,cp=sp?u.cpS:u.cpN,de=sp?50:20;
+  h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w60">'+fl.use+'</div><div class="tgc w100 b pass">'+td+' ft</div><div class="tgc w100 b '+(cp<100?'warn':'pass')+'">'+cp+' ft</div><div class="tgc w80">'+de+' ft</div></div>';});
+  h+='</div>';
+  document.getElementById('tdout').innerHTML=h;
+}
+function runSep(){
+  var f=S.floors,sp=S.spr,gs=[...new Set(f.map(function(fl){return fl.use;}))],h='';
+  if(gs.length===1)h='<div class="ob ob-pass"><div class="obt">Single group ('+UD[gs[0]].g+') — no separation required</div><div class="obb">Table 508.4 only applies when two different groups share the building.</div></div>';
+  else{h='<div class="tg"><div class="tgh"><div class="tgc b">Boundary</div><div class="tgc b">Groups</div><div class="tgc b w120">Separation</div></div>';var dn=[];
+  for(var i=0;i<f.length-1;i++){var g1=f[i].use,g2=f[i+1].use;if(g1!==g2){var k=g1+'|'+g2;if(dn.indexOf(k)<0){dn.push(k);var s=getSep(g1,g2,sp);h+='<div class="tgr '+(s==='NR'?'ok':'warn')+'"><div class="tgc">'+floorLabel(i)+' / '+floorLabel(i+1)+'</div><div class="tgc">'+g1+' ↔ '+g2+'</div><div class="tgc w120 b '+(s==='NR'?'pass':'warn')+'">'+s+'</div></div>';}}}h+='</div>';}
+  document.getElementById('sepout').innerHTML=h;
+}
+function runLoad(){
+  var f=S.floors,h='<div class="tg"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w60">Group</div><div class="tgc b w120">Live load</div><div class="tgc b">Reference</div></div>';
+  f.forEach(function(fl,i){var ll=llMap[fl.use]||50,lob=i===0&&ll<100,fin=lob?100:ll;
+  h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w60">'+fl.use+'</div><div class="tgc w120 b pass">'+fin+' PSF'+(lob?' (lobby)':'')+'</div><div class="tgc">Table 1607.1</div></div>';});
+  h+='<div class="tgr"><div class="tgc">Roof — maintenance</div><div class="tgc w60">—</div><div class="tgc w120 b">20 PSF</div><div class="tgc">Table 1607.1</div></div>';
+  h+='<div class="tgr warn"><div class="tgc">Roof — assembly</div><div class="tgc w60">A-2/A-3</div><div class="tgc w120 b fail">100 PSF</div><div class="tgc">Table 1607.1</div></div>';
+  h+='<div class="tgr"><div class="tgc">Stairs &amp; corridors</div><div class="tgc w60">—</div><div class="tgc w120 b">100 PSF</div><div class="tgc">Table 1607.1</div></div>';
+  h+='<div class="tgr"><div class="tgc">Guardrails</div><div class="tgc w60">—</div><div class="tgc w120 b">200 lb + 50 lb/ft</div><div class="tgc">Table 1607.8</div></div></div>';
+  document.getElementById('loadout').innerHTML=h;
+}
+function runSI(){
+  var si=[['§1705.2','Steel — welds, bolts','Continuous'],['§1705.3','Concrete — rebar, mix, slump','Continuous'],['§1705.4','Masonry — CMU, grout','Continuous'],['§1705.6','Soils — compaction, fill','Periodic'],['§1705.8','Deep foundations — piers','Continuous'],['§1705.12','Wind resistance','Periodic'],['§1705.16','Intumescent fire-resistance','Continuous'],['§1705.18','Fire-resistant penetrations','Periodic']];
+  var h='<div class="tg"><div class="tgh"><div class="tgc b w80">§1705</div><div class="tgc b">What is inspected</div><div class="tgc b w90">Frequency</div></div>';
+  si.forEach(function(r){h+='<div class="tgr hi"><div class="tgc w80 b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+  h+='</div>';
+  document.getElementById('siout').innerHTML=h;
+}
+
+/* ═══ IRC STEP RENDERER ═══ */
+function renderIRCStep(n){
+  var el=document.getElementById('bsb'+n);var yr=S.code.replace('IRC','');
+  if(n===1){
+    el.innerHTML='<div class="qb qb-g"><div class="ql">IRC '+yr+' question</div><div class="qt">What type of dwelling, how many stories, floor area, bedrooms, bathrooms?</div></div>'+
+    '<div class="bref"><div class="brl">§R101.2 scope</div><div class="brt">Detached one- and two-family dwellings and townhouses ≤ 3 stories. If outside IRC scope, IBC governs (§R102.7).</div></div>'+
+    '<div class="pigrid"><div class="pif"><span class="pil">Project name</span><input type="text" id="pname" placeholder="e.g. Smith Residence" oninput="S.projName=this.value"></div><div class="pif"><span class="pil">City / state</span><input type="text" id="pcity" placeholder="e.g. Frisco, TX" oninput="S.projCity=this.value"></div></div>'+
+    '<div class="irow"><span class="ilbl">Dwelling type</span><select onchange="S.ircType=this.value"><option value="sfr">Single-family detached</option><option value="dup">Duplex</option><option value="town">Townhouse</option></select></div>'+
+    '<div class="irow"><span class="ilbl">Number of stories</span><select onchange="S.ircStories=+this.value"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></div>'+
+    '<div class="irow"><span class="ilbl">Total conditioned area</span><input type="number" value="2400" min="200" max="20000" onchange="S.ircArea=+this.value"><span style="font-size:11px;color:var(--tx2);margin-left:3px">sf</span></div>'+
+    '<div class="irow"><span class="ilbl">Bedrooms</span><input type="number" value="3" min="1" max="10" onchange="S.ircBeds=+this.value"></div>'+
+    '<div class="irow"><span class="ilbl">Bathrooms</span><input type="number" value="2" min="1" max="10" step="0.5" onchange="S.ircBaths=+this.value"></div>'+
+    '<div class="irow"><span class="ilbl">Basement?</span><select onchange="S.ircBasement=this.value===\'yes\'"><option value="no">No</option><option value="yes">Yes</option></select></div>'+
+    '<div class="irow"><span class="ilbl">Attached garage?</span><select onchange="S.ircGarage=this.value===\'yes\'"><option value="no">No</option><option value="yes">Yes</option></select></div>'+
+    '<div class="navr"><span></span><button class="btn btn-g" onclick="bDone(1)">Confirm & continue →</button></div>';
+  } else {
+    // IRC steps 2-10 use static prescriptive tables
+    var ircData=[
+      null,
+      {q:'What framing method? IRC provides prescriptive tables — no engineering required if followed exactly.',rows:[['Wall studs','2×4 @ 16" or 2×6 @ 24"','R602.3'],['Max stud height','10 ft (2×4 @ 16")','R602.3.1'],['Floor joists','Per Table R502.3.1','R502.3.1'],['Roof rafters','Per Table R802.4.1','R802.4.1'],['Headers','Per Table R602.7','R602.7'],['Anchor bolts','½"×10" @ 6 ft o.c.','R403.1.6']]},
+      {q:'Does each room meet minimum size and ceiling height requirements?',rows:[['One room ≥ 120 sf','Required','R304.1'],['Other rooms ≥ 70 sf','Required','R304.2'],['Min dimension','7 ft any direction','R304.3'],['Ceiling height','7 ft min habitable','R305.1'],['Natural light','Glazed ≥ 8% of area','R303.1'],['Ventilation','Openable ≥ 4% or mech.','R303.3']]},
+      {q:'Where are smoke alarms, CO detectors, and fire sprinklers required?',rows:[['Smoke — bedrooms','Inside each sleeping room','R314.3'],['Smoke — sleeping area','Outside each sleeping area','R314.3'],['Smoke — each story','Required every story','R314.3'],['CO alarm','Outside sleeping rooms + each story','R315.1'],['Sprinklers','Verify local adoption of §R313','R313']]},
+      {q:'Every sleeping room and basement must have an emergency escape opening.',rows:[['Net clear area','5.7 sf (5.0 sf at grade)','R310.2'],['Min height','24" net clear','R310.2.1'],['Min width','20" net clear','R310.2.2'],['Max sill height','44" above floor','R310.2.3'],['Primary exit door','36" wide × 6\'8" tall','R311.2']]},
+      {q:'What are the stair dimensional requirements?',rows:[['Width','36" min clear','R311.7.1'],['Max riser','8¾ inches','R311.7.4.1'],['Min tread','9 inches','R311.7.5.1'],['Handrail height','34"–38"','R311.7.8.1'],['Headroom','6\'8" min','R311.7.2']]},
+      {q:'Where are guards required and what are the dimensional requirements?',rows:[['When required','>30" above floor/grade','R312.1'],['Min height','36" (deck/floor)','R312.1.2'],['At stairs','34" above nosing','R312.1.3'],['Sphere test','No 4" sphere below 34"','R312.1.4']]},
+      {q:'Plumbing clearances, GFCI, and AFCI requirements.',rows:[['WC side clearance','15" center to wall','P2705.1'],['WC front clearance','21" clear','P2705.1'],['Shower min area','900 sq in (30"×30")','P2708.1'],['GFCI — bathrooms','All receptacles','E3902.1'],['GFCI — kitchen','Within 6 ft of sink','E3902.2'],['AFCI — bedrooms','All bedroom circuits','E3902.12']]},
+      {q:'Energy insulation R-values and window U-factors by climate zone.',rows:[['Ceiling/attic','R-30 to R-49 by zone','N1102.1.2'],['Walls (cavity)','R-13 to R-20+5 by zone','N1102.1.2'],['Floors','R-13 to R-30 by zone','N1102.1.2'],['Windows U-factor','0.27 to 0.40 by zone','N1102.1.2']]},
+      {q:'Foundation depth, footing sizes, and drainage requirements.',rows:[['Frost depth','Per Table R301.2','R403.1.4'],['Footing — 1 story','12" wide × 6" thick','Table R403.1'],['Footing — 2 story','15" wide × 7" thick','Table R403.1'],['Footing — 3 story','23" wide × 8" thick','Table R403.1'],['Drainage','Drain tile at footing','R405.1'],['Anchor bolts','½"×10" @ 6 ft o.c.','R403.1.6']]}
+    ];
+    var d=ircData[n-1];
+    if(!d){el.innerHTML='';return;}
+    var h='<div class="qb qb-g"><div class="ql">IRC '+yr+' question</div><div class="qt">'+d.q+'</div></div>';
+    h+='<div class="tg"><div class="tgh"><div class="tgc b">Requirement</div><div class="tgc b">IRC '+yr+' value</div><div class="tgc b w80">Section</div></div>';
+    d.rows.forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w80">§'+r[2]+'</div></div>';});
+    h+='</div>';
+    h+='<div class="navr"><button class="btn" onclick="bBack('+n+')">← Back</button><button class="btn btn-g" onclick="bDone('+n+')">'+(n===10?'Finish →':'Confirm →')+'</button></div>';
+    el.innerHTML=h;
+  }
+}
+
+/* ═══ STEP NAVIGATION ═══ */
+function bDone(n){
+  if(n===1&&!isIRC&&S.floors.length===0){alert('Add at least one floor.');return;}
+  if(n===2&&!isIRC&&!S.ctype){alert('Select a construction type.');return;}
+  if(n===4&&!isIRC)S.spr=document.getElementById('bspr').value==='yes';
+  var c=document.getElementById('bsc'+n);c.classList.remove('active');c.classList.add('done');
+  document.getElementById('bsn'+n).innerHTML='✓';document.getElementById('bss'+n).textContent='Done';
+  var nx=n+1;
+  if(nx<=10){
+    var nc=document.getElementById('bsc'+nx);nc.classList.add('ul','active');
+    document.getElementById('bss'+nx).textContent='In progress';
+    renderStep(nx);
+    nc.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('bpfill').style.width=(nx*10)+'%';
+    document.getElementById('bplbl').textContent='Step '+nx+' of 10';
+  } else {
+    buildBSum();
+    document.getElementById('bpfill').style.width='100%';
+    document.getElementById('bplbl').textContent='Complete';
+    document.getElementById('bsum').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function bBack(n){
+  var c=document.getElementById('bsc'+n);c.classList.remove('active','ul');
+  document.getElementById('bss'+n).textContent='Locked';
+  var p=n-1,pc=document.getElementById('bsc'+p);
+  pc.classList.remove('done');pc.classList.add('active');
+  document.getElementById('bsn'+p).textContent=p;
+  document.getElementById('bss'+p).textContent='In progress';
+  document.getElementById('bpfill').style.width=(p*10)+'%';
+  document.getElementById('bplbl').textContent='Step '+p+' of 10';
+  pc.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function buildBSum(){
+  document.getElementById('bsumtitle').textContent='Summary — '+(S.projName||'New project');
+  var rows;
+  if(!isIRC){
+    var f=S.floors,mr=getMR(),ct=CT[S.ctype]||{n:'—',fr:'—'},tot=f.reduce(function(a,fl){return a+fl.area;},0),lg=Math.max.apply(null,f.map(function(fl){return fl.area;})),to=S.occLoads.reduce(function(a,b){return a+b;},0),mu=UD[mr],td=S.spr?mu.tdS:mu.tdN,cp=S.spr?mu.cpS:mu.cpN;
+    rows=[['Code',S.code.replace('IBC','IBC ')],['Stories / area',f.length+' / '+tot.toLocaleString()+' sf'],['Construction',ct.n+' — '+ct.fr],['Sprinklers',S.spr?'NFPA 13':'None'],['Total occupancy',to+' persons'],['Max travel distance',td+' ft'],['DFW Airport',S.isDFW?'Yes — DCM applies':'No']];
+  } else {
+    rows=[['Code',S.code.replace('IRC','IRC ')],['Type',S.ircType],['Stories',S.ircStories],['Area',S.ircArea.toLocaleString()+' sf'],['Bedrooms / Bathrooms',S.ircBeds+' / '+S.ircBaths]];
+  }
+  var h='';rows.forEach(function(r){h+='<div class="srow"><span class="slbl">'+r[0]+'</span><span class="sval">'+r[1]+'</span></div>';});
+  h+='<div class="ob ob-info" style="margin-top:8px"><div class="obt">Use the tabs above for Fire, Egress, Elevator, ADA/TAS, MEP, Energy, and DFW Airport analyses</div><div class="obb">Your project inputs from this building tab carry forward to every other discipline. Each tab provides its own step-by-step analysis, code references, and budget alternates.</div></div>';
+  document.getElementById('bsumcontent').innerHTML=h;
+  document.getElementById('bsum').style.display='block';
+}
+function resetBldg(){
+  S={code:'',floors:[],ctype:'',spr:true,occLoads:[],projName:'',projCity:'',done:[],ircStories:2,ircArea:2400,ircBeds:3,ircBaths:2,ircBasement:false,ircGarage:false,ircType:'sfr',isDFW:false};isIRC=false;
+  document.querySelectorAll('#p-bldg .cp').forEach(function(c){c.classList.remove('sel','sg')});
+  document.getElementById('bnr-b').style.display='none';document.getElementById('bnr-g').style.display='none';
+  document.getElementById('bldg-wb').innerHTML='<div class="ob ob-info"><div class="obt">Select a code edition above to begin</div><div class="obb">Choose IBC or IRC, then define your building floor by floor.</div></div>';
+}
+
+/* ═══ OTHER PANEL LOADERS ═══ */
+function loadPanel(id){
+  var el=document.getElementById('p-'+id);
+  if(id==='fire')el.innerHTML=mkFire();
+  else if(id==='egress')el.innerHTML=mkEgress();
+  else if(id==='elev')el.innerHTML=mkElev();
+  else if(id==='ada')el.innerHTML=mkADA();
+  else if(id==='mep')el.innerHTML=mkMEP();
+  else if(id==='energy')el.innerHTML=mkEnergy();
+  else if(id==='dfw')el.innerHTML=mkDFW();
+}
+function mkFire(){
+  var f=S.floors||[];var nFloors=f.length;var largestFloor=nFloors?Math.max.apply(null,f.map(function(x){return x.area;})):0;
+  return '<div class="slbl">Fire Protection — inputs from Building tab</div>'+
+  (nFloors?'<div class="ob ob-info"><div class="obt">'+nFloors+' floors detected · largest floor: '+largestFloor.toLocaleString()+' sf</div><div class="obb">Sprinkler triggers and fire alarm requirements calculated from your building inputs.</div></div>':'<div class="ob ob-warn"><div class="obt">No building defined yet</div><div class="obb">Go to the Building tab first and define your floors. The fire analysis uses your floor areas, heights, and occupancy groups.</div></div>')+
+  '<div class="qb qb-a"><div class="ql">Fire protection decision tree</div><div class="qt">When is a sprinkler system required, what type, and what are the alternatives to save budget?</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">System</div><div class="tgc b">Standard</div><div class="tgc b">Cost range</div><div class="tgc b">When to use</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">NFPA 13</div><div class="tgc">Full commercial</div><div class="tgc">$3–$6/sf</div><div class="tgc">All commercial. Required by §903.3.1.1.</div></div>'+
+  '<div class="tgr"><div class="tgc b">NFPA 13R</div><div class="tgc">Residential ≤4 stories</div><div class="tgc">$2–$4/sf</div><div class="tgc">R occupancies ≤4 stories. No attic/closet/small bath coverage. Saves 30–40%.</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">NFPA 13D</div><div class="tgc">1-2 family dwellings</div><div class="tgc">$1–$2/sf</div><div class="tgc">IRC §R313. Lowest cost. Off domestic water line.</div></div></div>'+
+  '<div class="altbox"><div class="altt">💰 5 budget alternates to reduce/eliminate sprinkler cost</div><div class="altb">'+
+  '<strong>1. Reduce below triggers:</strong> Each floor under 12,000 sf (B) + ≤2 stories = no §903.2 trigger.<br>'+
+  '<strong>2. Use 13R instead of 13:</strong> R occupancies ≤4 stories. Saves 30–40%.<br>'+
+  '<strong>3. Fire area subdivision:</strong> Fire walls (§706) to keep each fire area below threshold.<br>'+
+  '<strong>4. §104.11 alternative means:</strong> Petition building official with fire engineering analysis.<br>'+
+  '<strong>5. Reclassify occupancy:</strong> Unused floors as S-2 storage to reduce fire area.</div></div>'+
+  '<div class="ob ob-info"><div class="obt">Fire alarm — §907 (separate from sprinklers)</div><div class="obb">B with >100 occ: manual alarm. R-2: auto smoke detection per unit + corridor. A with >300 occ: voice/EVAC system. Fire alarm cannot be eliminated by any code alternate.</div></div>';
+}
+function mkEgress(){
+  return '<div class="slbl">Means of Egress — Complete Analysis</div>'+
+  '<div class="qb qb-b"><div class="ql">Egress components — §1003–§1030</div><div class="qt">How many exits, how wide, how far apart, and what are the stair/corridor/guard requirements?</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Component</div><div class="tgc b">IBC requirement</div><div class="tgc b w80">Reference</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Exit count</div><div class="tgc">1–50 occ: 1 exit (if Table 1006.3.4 met). 51–500: 2. 501–1000: 3. 1001+: 4.</div><div class="tgc w80">§1006</div></div>'+
+  '<div class="tgr"><div class="tgc b">Door width</div><div class="tgc">Min 32" clear. Formula: 0.15 in × occ count. Use larger.</div><div class="tgc w80">§1005.1</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Stair width</div><div class="tgc">≤50 occ: 36". >50 occ: 44". Formula: 0.2 in × occ.</div><div class="tgc w80">§1011.2</div></div>'+
+  '<div class="tgr"><div class="tgc b">Risers (IBC)</div><div class="tgc">Max 7". Min 4". Max ⅜" variation between adjacent.</div><div class="tgc w80">§1011.5.2</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Treads (IBC)</div><div class="tgc">Min 11" depth. Nosing: ¾"–1¼" projection.</div><div class="tgc w80">§1011.5.3</div></div>'+
+  '<div class="tgr"><div class="tgc b">Handrails</div><div class="tgc">Both sides. 34"–38" above nosing. 1¼"–2" graspable. Extensions top+bottom.</div><div class="tgc w80">§1014</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Guards</div><div class="tgc">>30" above grade: 42" height (IBC). No 4" sphere. 36" IRC residential.</div><div class="tgc w80">§1015</div></div>'+
+  '<div class="tgr"><div class="tgc b">Corridors</div><div class="tgc">Min 44" (>10 occ). 36" (<10 occ). ADA: 48" preferred.</div><div class="tgc w80">§1020.2</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Exit separation</div><div class="tgc">Min ½ diagonal (⅓ diagonal if sprinklered).</div><div class="tgc w80">§1007.1.1</div></div>'+
+  '<div class="tgr"><div class="tgc b">Exit signs</div><div class="tgc">Illuminated at every exit. Emergency lighting: 1 fc for 90 min.</div><div class="tgc w80">§1013/§1008</div></div></div>'+
+  '<div class="altbox"><div class="altt">💰 Egress budget alternates</div><div class="altb"><strong>Single exit</strong> (B, sprinklered, ≤49 occ): saves $15K–$40K.<br><strong>Exterior stair</strong> (§1027): no shaft enclosure — saves $10K–$25K.<br><strong>Horizontal exit</strong> (§1026): 2-hr fire barrier replaces a stairway in large-footprint buildings.</div></div>';
+}
+function mkElev(){
+  var f=S.floors||[];var nF=f.length;var anyOver3K=f.some(function(fl){return fl.area>3000;});
+  var needsElev=nF>1&&(anyOver3K||nF>=3);
+  return '<div class="slbl">Elevator Determination — IBC Ch.30 · ASME A17.1 · ADA §206</div>'+
+  (nF?'<div class="ob '+(needsElev?'ob-fail':'ob-pass')+'"><div class="obt">'+(needsElev?'Elevator REQUIRED for this building':'Elevator may NOT be required')+'</div><div class="obb">'+nF+' stories. '+(anyOver3K?'At least one floor exceeds 3,000 sf.':'All floors under 3,000 sf.')+(needsElev?' Per ADA §206.2.3 and IBC §1104.4, an elevator is required.':' Per ADA §206.2.3 Exception 1, an elevator MAY be exempt if not a medical office, shopping center, or transit station. Verify with AHJ.')+'</div></div>':'<div class="ob ob-warn"><div class="obt">Define your building first</div><div class="obb">Go to the Building tab to enter floor areas. The elevator trigger depends on story count and floor area.</div></div>')+
+  '<div class="qb qb-p"><div class="ql">Three independent triggers</div><div class="qt">If ANY one applies, an elevator is required. ADA §206.2.3 + IBC §1104.4 + IBC §1109.7.</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Test</div><div class="tgc b w80">If YES</div><div class="tgc b w80">If NO</div><div class="tgc b w80">Ref</div></div>'+
+  '<div class="tgr pi"><div class="tgc b">More than 1 story?</div><div class="tgc w80">Continue ↓</div><div class="tgc w80 pass">No elevator</div><div class="tgc w80">—</div></div>'+
+  '<div class="tgr"><div class="tgc b">Any floor >3,000 sf?</div><div class="tgc w80 fail">Required</div><div class="tgc w80">Continue ↓</div><div class="tgc w80">ADA §206.2.3</div></div>'+
+  '<div class="tgr pi"><div class="tgc b">Medical, shopping, transit?</div><div class="tgc w80 fail">Required regardless</div><div class="tgc w80">Continue ↓</div><div class="tgc w80">ADA Exc.1</div></div>'+
+  '<div class="tgr"><div class="tgc b">3+ stories?</div><div class="tgc w80 fail">Required</div><div class="tgc w80 pass">No elevator for 2-story &lt;3K sf</div><div class="tgc w80">ADA Exc.1</div></div></div>'+
+  '<div class="ob ob-purp"><div class="obt">Minimum elevator specs when required</div><div class="obb"><strong>Car min:</strong> 68"W × 54"D interior (ADA §407.4.1). Doors: 36" clear. Door hold: 3 sec min.<br><strong>ASME A17.1:</strong> Emergency phone, ventilation, emergency lighting, fire recall (§2.27.3), seismic switches.<br><strong>Hoistway:</strong> Fire-rated shaft — 2-hr if 4+ stories (§713.4), 1-hr if ≤3. Pit: 4–8 ft. Machine room: 7–12 ft clear.<br><strong>§3007 fire service elevator:</strong> Required if building >120 ft. Min 3,500 lb, 68"×51" car, fire-rated lobby every floor.</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Type</div><div class="tgc b">Travel</div><div class="tgc b">Cost (2024)</div><div class="tgc b">Best for</div></div>'+
+  '<div class="tgr pi"><div class="tgc b">Hydraulic</div><div class="tgc">~70 ft / 150 fpm</div><div class="tgc">$75K–$150K</div><div class="tgc">2–5 stories. Lowest cost.</div></div>'+
+  '<div class="tgr"><div class="tgc b">MRL (machine-room-less)</div><div class="tgc">~250 ft / 500 fpm</div><div class="tgc">$120K–$300K</div><div class="tgc">Mid-rise. No machine room.</div></div>'+
+  '<div class="tgr pi"><div class="tgc b">Traction (geared)</div><div class="tgc">~250 ft / 500 fpm</div><div class="tgc">$150K–$350K</div><div class="tgc">5–15 stories.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Traction (gearless)</div><div class="tgc">Unlimited</div><div class="tgc">$300K–$800K+</div><div class="tgc">High-rise 15+.</div></div>'+
+  '<div class="tgr pi"><div class="tgc b">LULA</div><div class="tgc">25 ft / 30 fpm</div><div class="tgc">$40K–$80K</div><div class="tgc">ADA retrofit. Max 2 stops.</div></div></div>'+
+  '<div class="altbox"><div class="altt">💰 Elevator budget alternates</div><div class="altb"><strong>Design all floors under 3,000 sf:</strong> eliminates ADA elevator trigger for 2-story buildings. Saves $75K–$150K.<br><strong>LULA instead of full elevator:</strong> ~50% cost. Existing building retrofits.<br><strong>Platform lift (§1109.8):</strong> $15K–$30K. Max ~14 ft travel. Only where elevator not independently required.<br><strong>Single-story building:</strong> No elevator ever needed. Increase footprint instead of adding stories.</div></div>';
+}
+function mkADA(){
+  return '<div class="slbl">Accessibility — ADA 2012 + Texas TAS + IBC §1101–§1110</div>'+
+  '<div class="ob ob-teal"><div class="obt">Texas TAS — TDLR registration required before permit</div><div class="obb">All Texas public buildings must be reviewed by a Registered Accessibility Specialist (RAS) and registered with TDLR before the building permit is issued. The registration number must appear on the CDs cover sheet. Failure = stop-work orders and fines.</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Element</div><div class="tgc b">ADA 2012 Standard</div><div class="tgc b w90">TAS note</div><div class="tgc b w70">Ref</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">Route width</div><div class="tgc">36" min (44" at turns). 60" for passing.</div><div class="tgc w90">Same</div><div class="tgc w70">§403.5</div></div>'+
+  '<div class="tgr"><div class="tgc b">Door clear width</div><div class="tgc">32" min when open 90°</div><div class="tgc w90">Same</div><div class="tgc w70">§404.2.3</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">Door maneuvering</div><div class="tgc">Pull: 60"D × 18" latch. Push: 48"D.</div><div class="tgc w90">Same</div><div class="tgc w70">§404.2.4</div></div>'+
+  '<div class="tgr"><div class="tgc b">Threshold</div><div class="tgc">½" max</div><div class="tgc w90">Same</div><div class="tgc w70">§404.2.5</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">Ramp</div><div class="tgc">Max 1:12 slope. Max 30" rise per run. Handrails both sides.</div><div class="tgc w90">Same</div><div class="tgc w70">§405</div></div>'+
+  '<div class="tgr"><div class="tgc b">WC turning</div><div class="tgc">60" diameter or T-shape (60"×60")</div><div class="tgc w90">Same</div><div class="tgc w70">§304.3</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">WC clearance</div><div class="tgc">56"D (wall) / 59"D (floor). 60" wide. Grab bars: 42" side + 36" rear.</div><div class="tgc w90">Same</div><div class="tgc w70">§604</div></div>'+
+  '<div class="tgr"><div class="tgc b">Parking count</div><div class="tgc">1–25: 1 accessible. 26–50: 2. 51–75: 3. 76–100: 4. 1 in 6 = van (8\'+8\' aisle).</div><div class="tgc w90">May add van</div><div class="tgc w70">§208.2</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">Signage</div><div class="tgc">Braille + raised chars. 48"–60" AFF on latch side.</div><div class="tgc w90">Same</div><div class="tgc w70">§703</div></div>'+
+  '<div class="tgr"><div class="tgc b">Drinking fountains</div><div class="tgc">1 wheelchair-height (≤36") + 1 standing (38"–43").</div><div class="tgc w90">Same</div><div class="tgc w70">§602</div></div>'+
+  '<div class="tgr ti"><div class="tgc b">Elevator (when req\'d)</div><div class="tgc">68"W × 54"D car. 36" door. Braille on controls. Audible signals.</div><div class="tgc w90">Same</div><div class="tgc w70">§407</div></div></div>';
+}
+function mkMEP(){
+  var totOcc=S.occLoads.reduce(function(a,b){return a+b;},0);
+  var totArea=S.floors.reduce(function(a,fl){return a+fl.area;},0);
+  return '<div class="slbl">MEP — IMC · IPC · NEC</div>'+
+  (totOcc?'<div class="ob ob-info"><div class="obt">Project: '+totOcc+' total occupants · '+totArea.toLocaleString()+' sf</div><div class="obb">Fixture counts, ventilation, and electrical loads calculated from your building inputs.</div></div>':'<div class="ob ob-warn"><div class="obt">Complete the Building tab first for calculated results</div><div class="obb">Reference tables are shown below. Calculated counts will appear once you define your building.</div></div>')+
+  '<div style="font-size:13px;font-weight:700;margin:10px 0 6px">Plumbing — IPC Table 403.1</div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Occupancy</div><div class="tgc b">WC male</div><div class="tgc b">WC female</div><div class="tgc b">Lavatory</div><div class="tgc b">Drinking ftn</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Business (B)</div><div class="tgc">1 per 25</div><div class="tgc">1 per 25</div><div class="tgc">1 per 40</div><div class="tgc">1 per 100</div></div>'+
+  '<div class="tgr"><div class="tgc b">Assembly (A-2)</div><div class="tgc">1 per 75</div><div class="tgc">1 per 40</div><div class="tgc">1 per 200</div><div class="tgc">1 per 500</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Mercantile (M)</div><div class="tgc">1 per 500</div><div class="tgc">1 per 500</div><div class="tgc">1 per 750</div><div class="tgc">1 per 1000</div></div></div>'+
+  (totOcc&&S.floors.length?('<div style="font-size:12px;font-weight:700;margin:10px 0 5px;color:var(--green)">Calculated fixture counts for your building:</div>'+calcFixtures()):'') +
+  '<div style="font-size:13px;font-weight:700;margin:14px 0 6px">Mechanical — IMC Table 403.3.1.1</div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Space type</div><div class="tgc b">CFM/person</div><div class="tgc b">CFM/sf</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Office</div><div class="tgc">5</div><div class="tgc">0.06</div></div>'+
+  '<div class="tgr"><div class="tgc b">Retail</div><div class="tgc">7.5</div><div class="tgc">0.12</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Restaurant</div><div class="tgc">7.5</div><div class="tgc">0.18</div></div>'+
+  '<div class="tgr"><div class="tgc b">Classroom</div><div class="tgc">10</div><div class="tgc">0.12</div></div></div>'+
+  '<div style="font-size:13px;font-weight:700;margin:14px 0 6px">Electrical — NEC</div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Parameter</div><div class="tgc b">NEC requirement</div><div class="tgc b w80">Article</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">Lighting — office</div><div class="tgc">3.5 VA/sf</div><div class="tgc w80">§220.12</div></div>'+
+  '<div class="tgr"><div class="tgc b">Receptacles</div><div class="tgc">180 VA per outlet</div><div class="tgc w80">§220.14</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">HVAC circuits</div><div class="tgc">125% largest motor + sum of others</div><div class="tgc w80">§430.24</div></div>'+
+  '<div class="tgr"><div class="tgc b">Emergency power</div><div class="tgc">Exit signs, egress lighting, fire alarm, elevator. Auto-transfer ≤10 sec.</div><div class="tgc w80">§700–§702</div></div>'+
+  '<div class="tgr hi"><div class="tgc b">GFCI</div><div class="tgc">Bathrooms, kitchens near sink, outdoors, garages, rooftops, elevator pits</div><div class="tgc w80">§210.8</div></div>'+
+  '<div class="tgr"><div class="tgc b">AFCI (NEC 2023)</div><div class="tgc">All 120V 15A/20A outlets in dwellings (expanded from bedrooms-only)</div><div class="tgc w80">§210.12</div></div></div>';
+}
+function calcFixtures(){
+  var h='<div class="tg"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w60">Occ</div><div class="tgc b">WC M</div><div class="tgc b">WC F</div><div class="tgc b">Lav</div><div class="tgc b">DF</div></div>';
+  var fixRates={B:[25,25,40,100],A2:[75,40,200,500],A3:[75,40,200,500],M:[500,500,750,1000],R2:[0,0,0,0],S1:[100,100,100,1000],S2:[100,100,100,1000],E:[50,50,50,100],P:[0,0,0,0]};
+  S.floors.forEach(function(fl,i){
+    var o=S.occLoads[i]||0;var r=fixRates[fl.use]||[25,25,40,100];var half=Math.ceil(o/2);
+    var wcm=r[0]?Math.max(1,Math.ceil(half/r[0])):0;var wcf=r[1]?Math.max(1,Math.ceil(half/r[1])):0;
+    var lav=r[2]?Math.max(1,Math.ceil(o/r[2])):0;var df=r[3]?Math.max(1,Math.ceil(o/r[3])):0;
+    h+='<div class="tgr gi"><div class="tgc b">'+floorLabel(i)+'</div><div class="tgc w60">'+o+'</div><div class="tgc pass b">'+wcm+'</div><div class="tgc pass b">'+wcf+'</div><div class="tgc">'+lav+'</div><div class="tgc">'+df+'</div></div>';
+  });
+  h+='</div>';return h;
+}
+function mkEnergy(){
+  return '<div class="slbl">Energy Code — IECC 2015/2018/2021 + ASHRAE 90.1</div>'+
+  '<div class="qb qb-g"><div class="ql">Energy code question</div><div class="qt">What insulation R-values, window U-factors, and lighting power densities does the energy code require? The table below shows all three editions side-by-side for Climate Zone 3A (DFW metro area).</div></div>'+
+  '<div class="irow"><span class="ilbl">Climate zone</span><select id="climzone" onchange="updateEnergy()"><option value="2">Zone 2 (Houston, San Antonio)</option><option value="3" selected>Zone 3A (Dallas-Fort Worth)</option><option value="4">Zone 4 (Oklahoma, N. Texas border)</option><option value="5">Zone 5 (N. US)</option></select></div>'+
+  '<div id="energyout"></div>';
+  setTimeout(updateEnergy,50);
+}
+function updateEnergy(){
+  var z=document.getElementById('climzone')?document.getElementById('climzone').value:'3';
+  var data={
+    '2':{roof:['R-25 ci','R-25 ci','R-30 ci'],wall:['R-13','R-13','R-13+R-3.8ci'],win:['U-0.55','U-0.50','U-0.40'],shgc:['0.25','0.25','0.25']},
+    '3':{roof:['R-25 ci','R-25 ci','R-30 ci'],wall:['R-13+R-3.8ci','R-13+R-3.8ci','R-13+R-7.5ci'],win:['U-0.55','U-0.50','U-0.40'],shgc:['0.25','0.25','0.25']},
+    '4':{roof:['R-25 ci','R-25 ci','R-30 ci'],wall:['R-13+R-7.5ci','R-13+R-7.5ci','R-13+R-7.5ci'],win:['U-0.42','U-0.38','U-0.36'],shgc:['0.40','0.40','0.38']},
+    '5':{roof:['R-30 ci','R-30 ci','R-30 ci'],wall:['R-13+R-7.5ci','R-13+R-7.5ci','R-13+R-10ci'],win:['U-0.42','U-0.36','U-0.32'],shgc:['0.40','0.40','0.38']}
+  };
+  var d=data[z]||data['3'];
+  var el=document.getElementById('energyout');if(!el)return;
+  el.innerHTML='<div class="tg"><div class="tgh"><div class="tgc b">Component</div><div class="tgc b">IECC 2015</div><div class="tgc b">IECC 2018</div><div class="tgc b">IECC 2021</div></div>'+
+  '<div class="tgr gi"><div class="tgc b">Roof insulation</div><div class="tgc">'+d.roof[0]+'</div><div class="tgc">'+d.roof[1]+'</div><div class="tgc b">'+d.roof[2]+'</div></div>'+
+  '<div class="tgr"><div class="tgc b">Steel-framed walls</div><div class="tgc">'+d.wall[0]+'</div><div class="tgc">'+d.wall[1]+'</div><div class="tgc b">'+d.wall[2]+'</div></div>'+
+  '<div class="tgr gi"><div class="tgc b">Windows U-factor</div><div class="tgc">'+d.win[0]+'</div><div class="tgc">'+d.win[1]+'</div><div class="tgc b">'+d.win[2]+'</div></div>'+
+  '<div class="tgr"><div class="tgc b">Windows SHGC</div><div class="tgc">'+d.shgc[0]+'</div><div class="tgc">'+d.shgc[1]+'</div><div class="tgc b">'+d.shgc[2]+'</div></div></div>'+
+  '<div style="font-size:13px;font-weight:700;margin:12px 0 6px">Lighting Power Density — Table C405.3.2</div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Space</div><div class="tgc b">Max W/sf</div><div class="tgc b">Typical LED</div></div>'+
+  '<div class="tgr gi"><div class="tgc b">Office — enclosed</div><div class="tgc">1.1</div><div class="tgc">0.5–0.7</div></div>'+
+  '<div class="tgr"><div class="tgc b">Office — open</div><div class="tgc">1.1</div><div class="tgc">0.4–0.6</div></div>'+
+  '<div class="tgr gi"><div class="tgc b">Retail</div><div class="tgc">1.7</div><div class="tgc">0.8–1.2</div></div>'+
+  '<div class="tgr"><div class="tgc b">Corridor</div><div class="tgc">0.66</div><div class="tgc">0.3–0.5</div></div></div>'+
+  '<div class="altbox"><div class="altt">💰 Energy budget strategies</div><div class="altb"><strong>Use ASHRAE 90.1 performance path</strong> instead of IECC prescriptive: allows trade-offs between components. Over-insulate the roof to relax wall requirements, or use better windows to reduce wall insulation.<br><strong>LED lighting</strong> runs well below LPD limits — the savings fund better windows or insulation where needed.</div></div>';
+}
+function mkDFW(){
+  return '<div class="slbl">DFW International Airport — Design Criteria Manual</div>'+
+  '<div class="ob ob-warn"><div class="obt">DFW Airport jurisdiction</div><div class="obb">DFW straddles Dallas and Fort Worth city limits. Permit issued by the city where the terminal is located. DFW Airport Board has additional authority over design standards within the airport property boundary. All construction requires DFW Board approval + city permit.</div></div>'+
+  '<div class="qb qb-a"><div class="ql">DFW DCM overlay</div><div class="qt">The DCM adds requirements on top of the base building code — it never reduces code requirements. Review must be obtained at 30%, 60%, 90%, and 100% CD stages before the city permit can be issued.</div></div>'+
+  '<div class="tg"><div class="tgh"><div class="tgc b">Discipline</div><div class="tgc b">DCM requirement</div><div class="tgc b">Notes</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Base code</div><div class="tgc">IBC 2021 + local amendments</div><div class="tgc">Verify Dallas vs Fort Worth jurisdiction.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Fire</div><div class="tgc">NFPA 13 — no exceptions. NFPA 409 for hangars.</div><div class="tgc">Addressable alarm with voice/EVAC integrated to airport network.</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Accessibility</div><div class="tgc">ADA + TAS + DOT ACAA 14 CFR 382</div><div class="tgc">All gates: accessible boarding bridges. Hearing loops at info counters.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Elevators</div><div class="tgc">ASME A17.1 + DCM Ch.14. Approved manufacturers. Min 3,500 lb passenger.</div><div class="tgc">All connected to airport BMS. Moving walkways per ASME A17.1 §6.1.</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Structural</div><div class="tgc">IBC + ASCE 7 + blast resistance (GSA/UFC) in secured areas.</div><div class="tgc">Progressive collapse prevention. Floor vibration limits for concourses.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Mechanical</div><div class="tgc">Central plant connection required. No standalone HVAC in terminals.</div><div class="tgc">Smoke control per §909 in all atriums and enclosed concourses.</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Electrical</div><div class="tgc">Airport main switchgear connection. No independent generators in terminals.</div><div class="tgc">UPS for security/IT. Lightning protection per NFPA 780.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Plumbing</div><div class="tgc">Grease traps all food service. Water-efficient fixtures.</div><div class="tgc">Stormwater per DCM Chapter 8.</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Energy</div><div class="tgc">IECC 2021 + ASHRAE 90.1 + LEED Silver minimum.</div><div class="tgc">Energy modeling per 90.1 Appendix G required. Solar-ready provisions.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Security</div><div class="tgc">TSA checkpoint layout. CCTV. SIDA badge readers. Ballistic-rated construction.</div><div class="tgc">Sterile/non-sterile boundary compliance.</div></div>'+
+  '<div class="tgr warn"><div class="tgc b">Signage</div><div class="tgc">DCM Ch.11 fonts, colors, pictograms. Bilingual. Digital per DCM spec.</div><div class="tgc">All signage must match terminal aesthetic standards.</div></div>'+
+  '<div class="tgr"><div class="tgc b">Finishes</div><div class="tgc">Approved palette — terrazzo concourses, specific ACT ceilings. Class A flame spread.</div><div class="tgc">All materials pre-approved by DFW Board.</div></div></div>'+
+  '<div class="ob ob-warn"><div class="obt">DFW submittal adds 4–8 weeks before city permit</div><div class="obb">Submittals at 30% SD, 60% DD, 90% CD, 100% CD — each requires DFW Board sign-off before proceeding. Final city permit only after DFW approves 100% CDs.</div></div>';
+}
+
+/* ═══ INIT ═══ */
+function init(){
+  // Energy panel needs manual trigger after load
+  document.querySelectorAll('.pnl').forEach(function(p){
+    if(p.id==='p-energy'){
+      // Will init when tab clicked
+    }
+  });
+}
+init();
+</script>
+</body>
+</html>

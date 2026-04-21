@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IBC / IRC Code Compliance Workbook</title>
+  <meta name="description" content="Step-by-step IBC 2018, IBC 2021, IRC 2018, IRC 2021 compliance guide for new building design. Calculate occupant loads, exits, travel distances, sprinkler triggers, and structural live loads.">
+  <style>
+    /* ─── Reset & base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:       #185FA5;
+      --blue-light: #E6F1FB;
+      --blue-mid:   #B5D4F4;
+      --blue-dark:  #0C447C;
+      --green:      #27500A;
+      --green-light:#EAF3DE;
+      --green-mid:  #C0DD97;
+      --amber-light:#FAEEDA;
+      --amber-mid:  #FAC775;
+      --amber-dark: #633806;
+      --red-light:  #FCEBEB;
+      --red-mid:    #F09595;
+      --red-dark:   #791F1F;
+      --gray-100:   #F1EFE8;
+      --gray-200:   #D3D1C7;
+      --gray-600:   #5F5E5A;
+      --gray-900:   #2C2C2A;
+      --text:       #1a1a18;
+      --text-muted: #5F5E5A;
+      --border:     rgba(0,0,0,0.12);
+      --bg:         #ffffff;
+      --bg-surface: #F8F7F4;
+      --radius:     10px;
+      --radius-sm:  6px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text:       #e8e6e0;
+        --text-muted: #a09e98;
+        --border:     rgba(255,255,255,0.12);
+        --bg:         #1a1a18;
+        --bg-surface: #242422;
+        --blue-light: #0c2240;
+        --green-light:#0f2205;
+        --amber-light:#2a1f08;
+        --red-light:  #2a0f0f;
+      }
+    }
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-surface);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── Header ─── */
+    .site-header {
+      background: var(--bg);
+      border-bottom: 0.5px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .site-logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+    .header-badge {
+      font-size: 11px;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-weight: 500;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      background: var(--bg);
+      border-bottom: 0.5px solid var(--border);
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      max-width: 640px;
+      margin: 0 auto 14px;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 520px;
+      margin: 0 auto 24px;
+      line-height: 1.65;
+    }
+    .hero-chips {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .chip {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 100px;
+      border: 0.5px solid var(--border);
+    }
+    .chip-blue { background: var(--blue-light); color: var(--blue-dark); }
+    .chip-green { background: var(--green-light); color: var(--green); }
+
+    /* ─── Features row ─── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 32px 24px;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+    .feat {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .feat-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      background: var(--blue-light);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 10px;
+    }
+    .feat-icon svg { width: 16px; height: 16px; stroke: var(--blue); fill: none; stroke-width: 2; stroke-linecap: round; }
+    .feat h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .feat p  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+    /* ─── Main workbook container ─── */
+    .workbook-container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    /* ─── Workbook inner styles (adapted from widget) ─── */
+    .wb { padding: 0; max-width: 100%; font-family: inherit; }
+    .prog-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .prog-bar { background: var(--bg-surface); border-radius: 100px; height: 6px; margin-bottom: 1.5rem; overflow: hidden; border: 0.5px solid var(--border); }
+    .prog-fill { height: 6px; background: var(--blue); border-radius: 100px; transition: width .4s; }
+    .code-picker { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 1.5rem; }
+    @media (max-width: 520px) { .code-picker { grid-template-columns: 1fr 1fr; } }
+    .cp-card { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 10px; cursor: pointer; transition: all .15s; background: var(--bg); text-align: center; }
+    .cp-card:hover { background: var(--bg-surface); transform: translateY(-1px); }
+    .cp-card.selected { border: 2px solid var(--blue); background: var(--blue-light); }
+    .cp-edition { font-size: 13px; font-weight: 600; color: var(--text); }
+    .cp-year { font-size: 22px; font-weight: 700; color: var(--text); margin: 2px 0; }
+    .cp-type { font-size: 11px; color: var(--text-muted); }
+    .cp-card.selected .cp-edition, .cp-card.selected .cp-year { color: var(--blue); }
+    .code-banner { border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 1.25rem; font-size: 12px; display: none; }
+    .cb-ibc { background: var(--blue-light); border: 0.5px solid var(--blue-mid); }
+    .cb-irc { background: var(--green-light); border: 0.5px solid var(--green-mid); }
+    .cb-label { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+    .cb-ibc .cb-label { color: var(--blue-dark); }
+    .cb-irc .cb-label { color: var(--green); }
+    .cb-note { font-size: 12px; color: var(--text-muted); }
+    .step-card { border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 1.25rem; overflow: hidden; display: none; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .step-card.unlocked { display: block; }
+    .step-card.done { border-color: var(--green-mid); }
+    .step-header { display: flex; align-items: stretch; }
+    .snb { min-width: 52px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; background: var(--bg-surface); color: var(--text-muted); }
+    .step-card.active .snb { background: var(--blue); color: #fff; }
+    .step-card.done .snb { background: var(--green-mid); color: var(--green); }
+    .smeta { padding: 12px 14px; flex: 1; background: var(--bg-surface); }
+    .step-card.active .smeta { background: var(--blue-light); }
+    .step-card.done .smeta { background: var(--green-light); }
+    .step-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .step-ibc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .sstatus { font-size: 11px; font-weight: 600; margin-top: 2px; }
+    .s-active { color: var(--blue-dark); }
+    .s-done { color: var(--green); }
+    .s-locked { color: var(--text-muted); }
+    .sbody { padding: 16px; background: var(--bg); display: none; }
+    .step-card.active .sbody, .step-card.done .sbody { display: block; }
+    .qblock { border-radius: var(--radius-sm); padding: 11px 14px; margin-bottom: 12px; }
+    .qb-ibc { background: var(--blue-light); }
+    .qb-irc { background: var(--green-light); }
+    .qlabel { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    .qb-ibc .qlabel { color: var(--blue-dark); }
+    .qb-irc .qlabel { color: var(--green); }
+    .qtext { font-size: 13px; line-height: 1.6; font-weight: 500; }
+    .qb-ibc .qtext { color: #042C53; }
+    .qb-irc .qtext { color: #173404; }
+    .bref { background: var(--bg-surface); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px; border: 0.5px solid var(--border); }
+    .brlabel { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    .brstep { font-size: 12px; color: var(--text-muted); line-height: 1.7; padding-left: 10px; border-left: 2px solid var(--border); margin-top: 4px; }
+    .irow { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+    .ilabel { font-size: 13px; color: var(--text-muted); min-width: 170px; flex-shrink: 0; }
+    .ob { border-radius: var(--radius-sm); padding: 10px 14px; margin: 8px 0; }
+    .ob-pass { background: var(--green-light); border: 0.5px solid var(--green-mid); }
+    .ob-fail { background: var(--red-light); border: 0.5px solid var(--red-mid); }
+    .ob-warn { background: var(--amber-light); border: 0.5px solid var(--amber-mid); }
+    .ob-info { background: var(--blue-light); border: 0.5px solid var(--blue-mid); }
+    .ob-green { background: var(--green-light); border: 0.5px solid var(--green-mid); }
+    .ob-title { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+    .ob-pass .ob-title, .ob-green .ob-title { color: var(--green); }
+    .ob-fail .ob-title { color: var(--red-dark); }
+    .ob-warn .ob-title { color: var(--amber-dark); }
+    .ob-info .ob-title { color: var(--blue-dark); }
+    .ob-body { font-size: 12px; line-height: 1.55; }
+    .ob-pass .ob-body, .ob-green .ob-body { color: #3B6D11; }
+    .ob-fail .ob-body { color: #A32D2D; }
+    .ob-warn .ob-body { color: #854F0B; }
+    .ob-info .ob-body { color: var(--blue); }
+    .tgrid { display: grid; gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; margin: 8px 0; font-size: 12px; }
+    .tgh { display: flex; background: var(--bg-surface); }
+    .tgr { display: flex; background: var(--bg); }
+    .tgr.hi { background: var(--blue-light); } .tgr.gi { background: var(--green-light); }
+    .tgr.ok { background: var(--green-light); } .tgr.bad { background: var(--red-light); } .tgr.warn { background: var(--amber-light); }
+    .tgc { padding: 6px 10px; flex: 1; color: var(--text-muted); font-size: 12px; }
+    .tgr .tgc { color: var(--text); }
+    .tgc.b { font-weight: 600; } .tgc.pass { color: var(--green); font-weight: 600; } .tgc.fail { color: var(--red-dark); font-weight: 600; } .tgc.warn { color: var(--amber-dark); font-weight: 600; }
+    .tgc.w70{flex:0 0 70px}.tgc.w80{flex:0 0 80px}.tgc.w90{flex:0 0 90px}.tgc.w100{flex:0 0 100px}.tgc.w110{flex:0 0 110px}.tgc.w130{flex:0 0 130px}
+    .navrow { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid var(--border); }
+    .btn { font-size: 13px; padding: 8px 18px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--bg); color: var(--text); cursor: pointer; transition: all .15s; font-family: inherit; }
+    .btn:hover { background: var(--bg-surface); }
+    .btnp { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btnp:hover { background: var(--blue-dark); }
+    .btng { background: var(--green); color: #fff; border-color: var(--green); }
+    .btng:hover { background: #173404; }
+    .sumcard { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-top: 1rem; display: none; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .sumtitle { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .sum-code-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 100px; display: inline-block; margin-bottom: 12px; }
+    .scb-ibc { background: var(--blue-light); color: var(--blue-dark); }
+    .scb-irc { background: var(--green-light); color: var(--green); }
+    .srow { display: flex; align-items: baseline; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+    .srow:last-child { border-bottom: none; }
+    .slabel { color: var(--text-muted); min-width: 210px; flex-shrink: 0; }
+    .sval { font-weight: 600; color: var(--text); flex: 1; }
+    .sibc { font-size: 11px; color: var(--text-muted); }
+    select, input[type=number], input[type=text] { font-size: 13px; padding: 6px 9px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: var(--bg); color: var(--text); font-family: inherit; }
+    input[type=number] { width: 90px; }
+    input[type=text] { width: 220px; }
+    select:focus, input:focus { outline: none; box-shadow: 0 0 0 2px var(--blue-mid); }
+    .floor-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+    .floor-table th { background: var(--bg-surface); color: var(--text-muted); font-weight: 600; text-align: left; padding: 6px 8px; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
+    .floor-table td { padding: 5px 8px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
+    .floor-table tr:last-child td { border-bottom: none; }
+    .floor-table input[type=number] { width: 78px; padding: 4px 6px; }
+    .floor-table select { min-width: 155px; padding: 4px 6px; }
+    .floor-name { font-weight: 600; font-size: 12px; color: var(--text); white-space: nowrap; }
+    .fbadge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+    .fb-B{background:#B5D4F4;color:#0C447C}.fb-A2{background:#F5C4B3;color:#712B13}.fb-A3{background:#F5C4B3;color:#712B13}.fb-M{background:#FAC775;color:#633806}.fb-R2{background:#9FE1CB;color:#085041}.fb-S1{background:#D3D1C7;color:#444441}.fb-S2{background:#D3D1C7;color:#444441}.fb-E{background:#C0DD97;color:#27500A}.fb-P{background:#CECBF6;color:#26215C}
+    .add-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .pi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    @media (max-width: 480px) { .pi-grid { grid-template-columns: 1fr; } }
+    .pi-field { display: flex; flex-direction: column; gap: 4px; }
+    .pi-label { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+    .irc-section { display: none; }
+    .ibc-section { display: none; }
+
+    /* ─── Footer ─── */
+    .site-footer {
+      background: var(--bg);
+      border-top: 0.5px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 40px;
+    }
+    .site-footer a { color: var(--blue); text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a class="site-logo" href="#">
+    <div class="logo-dot"></div>
+    IBC / IRC Workbook
+  </a>
+  <span class="header-badge">Free Tool</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Building code compliance</div>
+  <h1>Design any building<br>step by step with the code</h1>
+  <p>A free interactive workbook covering IBC 2018, IBC 2021, IRC 2018, and IRC 2021. Calculate occupancy groups, exits, travel distances, sprinkler triggers, structural loads, and special inspections.</p>
+  <div class="hero-chips">
+    <span class="chip chip-blue">IBC 2021</span>
+    <span class="chip chip-blue">IBC 2018</span>
+    <span class="chip chip-green">IRC 2021</span>
+    <span class="chip chip-green">IRC 2018</span>
+    <span class="chip">Commercial &amp; Residential</span>
+    <span class="chip">10 steps · Every chapter cited</span>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="features">
+  <div class="feat">
+    <div class="feat-icon">
+      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    </div>
+    <h3>10-step analysis</h3>
+    <p>Occupancy → construction type → height/area → sprinklers → loads → exits → separations</p>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    </div>
+    <h3>Live calculations</h3>
+    <p>Every result updates from your inputs — occupant loads, exit counts, PSF loads, fire ratings</p>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <h3>Per-floor control</h3>
+    <p>Set occupancy, area, and height independently for each floor — up to 9 levels</p>
+  </div>
+  <div class="feat">
+    <div class="feat-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <h3>Book references</h3>
+    <p>Every step shows exactly which section and table to open in the physical code book</p>
+  </div>
+</div>
+
+<!-- WORKBOOK -->
+<div class="workbook-container">
+  <div class="section-label">Interactive workbook — select your code to begin</div>
+  <div class="wb">
+
+    <!-- CODE PICKER -->
+    <div class="code-picker">
+      <div class="cp-card" id="cp-IBC2021" onclick="selectCode('IBC2021')">
+        <div class="cp-edition">IBC</div><div class="cp-year">2021</div><div class="cp-type">International Building Code</div>
+      </div>
+      <div class="cp-card" id="cp-IBC2018" onclick="selectCode('IBC2018')">
+        <div class="cp-edition">IBC</div><div class="cp-year">2018</div><div class="cp-type">International Building Code</div>
+      </div>
+      <div class="cp-card" id="cp-IRC2021" onclick="selectCode('IRC2021')">
+        <div class="cp-edition">IRC</div><div class="cp-year">2021</div><div class="cp-type">International Residential Code</div>
+      </div>
+      <div class="cp-card" id="cp-IRC2018" onclick="selectCode('IRC2018')">
+        <div class="cp-edition">IRC</div><div class="cp-year">2018</div><div class="cp-type">International Residential Code</div>
+      </div>
+    </div>
+
+    <div class="code-banner cb-ibc" id="banner-ibc">
+      <div class="cb-label" id="banner-title">—</div>
+      <div class="cb-note" id="banner-note">—</div>
+    </div>
+    <div class="code-banner cb-irc" id="banner-irc">
+      <div class="cb-label" id="banner-title-irc">—</div>
+      <div class="cb-note" id="banner-note-irc">—</div>
+    </div>
+
+    <div id="workbook-area" style="display:none">
+      <div class="prog-label" id="prog-label">Step 1 of 10 — define your project</div>
+      <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:10%"></div></div>
+
+      <!-- STEP 1 -->
+      <div class="step-card unlocked active" id="card-1">
+        <div class="step-header">
+          <div class="snb">1</div>
+          <div class="smeta">
+            <div class="step-title">Project information &amp; floor-by-floor definition</div>
+            <div class="step-ibc" id="s1-ibc-ref">—</div>
+            <div class="sstatus s-active" id="st-1">In progress</div>
+          </div>
+        </div>
+        <div class="sbody">
+          <div class="qblock qb-ibc" id="s1-qblock">
+            <div class="qlabel" id="s1-qlabel">The question you ask</div>
+            <div class="qtext" id="s1-qtext">—</div>
+          </div>
+          <div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s1-bref">—</div></div>
+          <div class="pi-grid">
+            <div class="pi-field"><span class="pi-label">Project name</span><input type="text" id="proj-name" placeholder="e.g. Maple Street Office"></div>
+            <div class="pi-field"><span class="pi-label">City / state</span><input type="text" id="proj-city" placeholder="e.g. Austin, TX"></div>
+          </div>
+          <div class="ibc-section" id="ibc-floor-section">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">Floor schedule</div>
+            <div style="overflow-x:auto"><table class="floor-table"><thead><tr><th>Level</th><th>Occupancy use</th><th>Gross area (sf)</th><th>Ht above grade (ft)</th><th>Group</th></tr></thead><tbody id="floor-tbody"></tbody></table></div>
+            <div class="add-row">
+              <button class="btn" onclick="addFloor()">+ Add floor</button>
+              <button class="btn" id="btn-rm" onclick="removeFloor()">− Remove top floor</button>
+              <span style="font-size:11px;color:var(--text-muted)" id="floor-count-lbl"></span>
+            </div>
+            <div id="floor-warn" style="margin-top:8px"></div>
+          </div>
+          <div class="irc-section" id="irc-dwelling-section">
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px">Dwelling unit information</div>
+            <div class="irow"><span class="ilabel">Dwelling type</span><select id="irc-dtype"><option value="sfr">Single-family residence (detached)</option><option value="dup">Duplex (2-family attached)</option><option value="town">Townhouse (attached, own foundation &amp; roof)</option></select></div>
+            <div class="irow"><span class="ilabel">Number of stories</span><select id="irc-stories"><option value="1">1 story</option><option value="2" selected>2 stories</option><option value="3">3 stories</option></select></div>
+            <div class="irow"><span class="ilabel">Total conditioned floor area</span><input type="number" id="irc-area" value="2400" min="200" max="20000"><span style="font-size:12px;color:var(--text-muted);margin-left:4px">sf</span></div>
+            <div class="irow"><span class="ilabel">Number of bedrooms</span><input type="number" id="irc-beds" value="3" min="1" max="10"></div>
+            <div class="irow"><span class="ilabel">Number of bathrooms</span><input type="number" id="irc-baths" value="2" min="1" max="10" step="0.5"></div>
+            <div class="irow"><span class="ilabel">Basement?</span><select id="irc-basement"><option value="no">No basement</option><option value="yes">Yes — full basement</option></select></div>
+            <div class="irow"><span class="ilabel">Attached garage?</span><select id="irc-garage"><option value="no">No garage</option><option value="att">Yes — attached garage</option></select></div>
+          </div>
+          <div class="navrow"><span></span><button class="btn btnp" id="btn-step1" onclick="completeStep(1)">Confirm &amp; continue →</button></div>
+        </div>
+      </div>
+
+      <!-- STEPS 2-10 (generic shells, populated by JS) -->
+      <div class="step-card" id="card-2"><div class="step-header"><div class="snb">2</div><div class="smeta"><div class="step-title" id="s2-title">—</div><div class="step-ibc" id="s2-ibc">—</div><div class="sstatus s-locked" id="st-2">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s2-qblock"><div class="qlabel" id="s2-ql">—</div><div class="qtext" id="s2-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s2-bref">—</div></div><div class="ibc-section" id="s2-ibc-sel"><div class="irow"><span class="ilabel">Construction type</span><select id="ctype" onchange="ctypeChange()"><option value="">— select type —</option><option value="IIB">Type II-B — non-combustible, unprotected (0 hrs)</option><option value="IIA">Type II-A — non-combustible, 1-hr protected</option><option value="IB">Type I-B — non-combustible, 2-hr structural frame</option><option value="IA">Type I-A — non-combustible, 3-hr structural frame</option><option value="VB">Type V-B — combustible (wood), unprotected (0 hrs)</option><option value="VA">Type V-A — combustible (wood), 1-hr protected</option><option value="IIIB">Type III-B — masonry exterior, combustible interior, unprotected</option><option value="IIIA">Type III-A — masonry exterior, combustible interior, 1-hr protected</option></select></div><div id="ctype-out" style="display:none"><div class="ob ob-info"><div class="ob-title" id="ctype-title">—</div><div class="ob-body" id="ctype-body">—</div></div></div></div><div class="irc-section" id="s2-irc-content"><div id="s2-irc-out"></div></div><div class="navrow"><button class="btn" onclick="goBack(2)">← Back</button><button class="btn btnp" id="btn-s2" onclick="completeStep(2)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-3"><div class="step-header"><div class="snb">3</div><div class="smeta"><div class="step-title" id="s3-title">—</div><div class="step-ibc" id="s3-ibc">—</div><div class="sstatus s-locked" id="st-3">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s3-qblock"><div class="qlabel" id="s3-ql">—</div><div class="qtext" id="s3-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s3-bref">—</div></div><div id="s3-out"><div class="ob ob-info"><div class="ob-body">Waiting for previous steps...</div></div></div><div class="navrow"><button class="btn" onclick="goBack(3)">← Back</button><button class="btn btnp" onclick="completeStep(3)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-4"><div class="step-header"><div class="snb">4</div><div class="smeta"><div class="step-title" id="s4-title">—</div><div class="step-ibc" id="s4-ibc">—</div><div class="sstatus s-locked" id="st-4">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s4-qblock"><div class="qlabel" id="s4-ql">—</div><div class="qtext" id="s4-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s4-bref">—</div></div><div id="s4-out"></div><div class="ibc-section" id="s4-spr-choice-row"><div class="irow" style="margin-top:10px"><span class="ilabel">Will you install sprinklers?</span><select id="spr-choice" onchange="sprChoiceChange()"><option value="yes">Yes — NFPA 13 throughout</option><option value="no">No — sprinkler-free design</option></select></div><div id="spr-choice-out" style="margin-top:6px"></div></div><div class="navrow"><button class="btn" onclick="goBack(4)">← Back</button><button class="btn btnp" onclick="completeStep(4)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-5"><div class="step-header"><div class="snb">5</div><div class="smeta"><div class="step-title" id="s5-title">—</div><div class="step-ibc" id="s5-ibc">—</div><div class="sstatus s-locked" id="st-5">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s5-qblock"><div class="qlabel" id="s5-ql">—</div><div class="qtext" id="s5-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s5-bref">—</div></div><div id="s5-out"></div><div class="navrow"><button class="btn" onclick="goBack(5)">← Back</button><button class="btn btnp" onclick="completeStep(5)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-6"><div class="step-header"><div class="snb">6</div><div class="smeta"><div class="step-title" id="s6-title">—</div><div class="step-ibc" id="s6-ibc">—</div><div class="sstatus s-locked" id="st-6">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s6-qblock"><div class="qlabel" id="s6-ql">—</div><div class="qtext" id="s6-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s6-bref">—</div></div><div id="s6-out"></div><div class="navrow"><button class="btn" onclick="goBack(6)">← Back</button><button class="btn btnp" onclick="completeStep(6)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-7"><div class="step-header"><div class="snb">7</div><div class="smeta"><div class="step-title" id="s7-title">—</div><div class="step-ibc" id="s7-ibc">—</div><div class="sstatus s-locked" id="st-7">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s7-qblock"><div class="qlabel" id="s7-ql">—</div><div class="qtext" id="s7-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s7-bref">—</div></div><div id="s7-out"></div><div class="navrow"><button class="btn" onclick="goBack(7)">← Back</button><button class="btn btnp" onclick="completeStep(7)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-8"><div class="step-header"><div class="snb">8</div><div class="smeta"><div class="step-title" id="s8-title">—</div><div class="step-ibc" id="s8-ibc">—</div><div class="sstatus s-locked" id="st-8">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s8-qblock"><div class="qlabel" id="s8-ql">—</div><div class="qtext" id="s8-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s8-bref">—</div></div><div id="s8-out"></div><div class="navrow"><button class="btn" onclick="goBack(8)">← Back</button><button class="btn btnp" onclick="completeStep(8)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-9"><div class="step-header"><div class="snb">9</div><div class="smeta"><div class="step-title" id="s9-title">—</div><div class="step-ibc" id="s9-ibc">—</div><div class="sstatus s-locked" id="st-9">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s9-qblock"><div class="qlabel" id="s9-ql">—</div><div class="qtext" id="s9-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s9-bref">—</div></div><div id="s9-out"></div><div class="navrow"><button class="btn" onclick="goBack(9)">← Back</button><button class="btn btnp" onclick="completeStep(9)">Confirm &amp; continue →</button></div></div></div>
+
+      <div class="step-card" id="card-10"><div class="step-header"><div class="snb">10</div><div class="smeta"><div class="step-title" id="s10-title">—</div><div class="step-ibc" id="s10-ibc">—</div><div class="sstatus s-locked" id="st-10">Locked</div></div></div><div class="sbody"><div class="qblock qb-ibc" id="s10-qblock"><div class="qlabel" id="s10-ql">—</div><div class="qtext" id="s10-qt">—</div></div><div class="bref"><div class="brlabel">How to use the code book</div><div class="brstep" id="s10-bref">—</div></div><div id="s10-out"></div><div class="navrow"><button class="btn" onclick="goBack(10)">← Back</button><button class="btn btnp" onclick="completeStep(10)">Finish — view compliance summary →</button></div></div></div>
+
+      <!-- SUMMARY -->
+      <div class="sumcard" id="summary">
+        <div class="sumtitle" id="sum-title">Compliance summary</div>
+        <span class="sum-code-badge scb-ibc" id="sum-badge">—</span>
+        <div id="summary-content"></div>
+        <div class="ob ob-info" style="margin-top:14px"><div class="ob-title">Next steps</div><div class="ob-body" id="sum-next">—</div></div>
+        <div style="margin-top:12px"><button class="btn" onclick="restartAll()">Start over →</button></div>
+      </div>
+    </div><!-- /workbook-area -->
+  </div><!-- /wb -->
+</div><!-- /workbook-container -->
+
+<footer class="site-footer">
+  <p>IBC / IRC Workbook &nbsp;·&nbsp; For reference only — always verify with your local building official and licensed design professionals &nbsp;·&nbsp; <a href="#">Disclaimer</a></p>
+</footer>
+
+<script>
+var activeCode='',isIRC=false;
+var ibcUseData={
+  'B':{label:'Office / business',group:'Group B',lf:150,lt:'gross',tdS:300,tdN:200,cpS:100,cpN:75,el1:49,el2:29,ll:50,aT:12000,hT:true,s3T:true},
+  'A2':{label:'Restaurant / bar / events',group:'Group A-2',lf:15,lt:'net',tdS:250,tdN:150,cpS:70,cpN:70,el1:49,el2:49,ll:100,aT:5000,hT:false,s3T:false},
+  'A3':{label:'Assembly — no food service',group:'Group A-3',lf:15,lt:'net',tdS:250,tdN:150,cpS:70,cpN:70,el1:49,el2:49,ll:100,aT:12000,hT:false,s3T:false},
+  'M':{label:'Retail / mercantile',group:'Group M',lf:60,lt:'gross',tdS:250,tdN:150,cpS:75,cpN:75,el1:49,el2:49,ll:100,aT:12000,hT:true,s3T:true},
+  'R2':{label:'Apartments / multi-family',group:'Group R-2',lf:200,lt:'gross',tdS:250,tdN:125,cpS:125,cpN:75,el1:10,el2:10,ll:40,aT:0,hT:false,s3T:false},
+  'S1':{label:'Storage — moderate hazard',group:'Group S-1',lf:300,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:125,aT:12000,hT:true,s3T:true},
+  'S2':{label:'Storage — low hazard',group:'Group S-2',lf:500,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:125,aT:12000,hT:true,s3T:true},
+  'E':{label:'School / classroom',group:'Group E',lf:20,lt:'net',tdS:250,tdN:150,cpS:75,cpN:75,el1:49,el2:49,ll:40,aT:12000,hT:true,s3T:true},
+  'P':{label:'Parking / mechanical',group:'Utility',lf:500,lt:'gross',tdS:250,tdN:200,cpS:100,cpN:100,el1:29,el2:29,ll:40,aT:12000,hT:true,s3T:true}
+};
+var ctypeData={
+  'IIB':{name:'Type II-B',fr:'0 hours',note:'Non-combustible, unprotected. Most economical steel/masonry option.',maxS:{B:4,A2:2,A3:2,M:4,R2:4,S1:2,S2:3,E:2,P:8},baseA:{B:9500,A2:9500,A3:9500,M:12500,R2:24000,S1:17500,S2:26000,E:14000,P:18000}},
+  'IIA':{name:'Type II-A',fr:'1 hr on frame+floors',note:'Non-combustible, 1-hr protected structural elements.',maxS:{B:6,A2:3,A3:3,M:5,R2:6,S1:3,S2:4,E:3,P:10},baseA:{B:14000,A2:14000,A3:14000,M:17500,R2:24000,S1:26000,S2:26000,E:23500,P:18000}},
+  'IB':{name:'Type I-B',fr:'2 hrs on frame',note:'Non-combustible, 2-hr structural frame.',maxS:{B:11,A2:11,A3:11,M:11,R2:11,S1:7,S2:8,E:5,P:12},baseA:{B:37500,A2:37500,A3:37500,M:37500,R2:37500,S1:26000,S2:26000,E:62500,P:37500}},
+  'IA':{name:'Type I-A',fr:'3 hrs on frame',note:'Highest protection. Unlimited stories for most groups.',maxS:{B:999,A2:999,A3:999,M:999,R2:999,S1:999,S2:999,E:5,P:999},baseA:{B:55000,A2:55000,A3:55000,M:55000,R2:55000,S1:37500,S2:37500,E:80500,P:55000}},
+  'VB':{name:'Type V-B',fr:'0 hours',note:'Combustible (wood), unprotected. Lowest height/area limits.',maxS:{B:2,A2:1,A3:1,M:2,R2:2,S1:1,S2:1,E:1,P:1},baseA:{B:9000,A2:6000,A3:6000,M:9000,R2:7000,S1:17000,S2:26000,E:9500,P:9000}},
+  'VA':{name:'Type V-A',fr:'1 hr throughout',note:'Combustible (wood), 1-hr protected.',maxS:{B:3,A2:2,A3:2,M:3,R2:3,S1:2,S2:2,E:2,P:2},baseA:{B:14000,A2:11500,A3:11500,M:14000,R2:12000,S1:26000,S2:26000,E:23500,P:14000}},
+  'IIIB':{name:'Type III-B',fr:'0 hrs interior',note:'Masonry exterior walls, combustible unprotected interior.',maxS:{B:4,A2:2,A3:2,M:4,R2:4,S1:3,S2:4,E:2,P:4},baseA:{B:12000,A2:12000,A3:12000,M:18500,R2:18000,S1:17500,S2:26000,E:23500,P:12000}},
+  'IIIA':{name:'Type III-A',fr:'1 hr interior',note:'Masonry exterior walls, combustible 1-hr protected interior.',maxS:{B:6,A2:3,A3:3,M:5,R2:6,S1:3,S2:4,E:3,P:6},baseA:{B:18000,A2:18000,A3:18000,M:25500,R2:24000,S1:26000,S2:26000,E:23500,P:18000}}
+};
+var sepTable={'B/A2':'2/1','B/A3':'2/1','B/M':'NR/NR','B/R2':'2/1','B/S1':'2/1','B/S2':'1/NR','B/E':'NR/NR','B/P':'1/NR','A2/A3':'NR/NR','A2/M':'1/1','A2/R2':'2/1','A2/S1':'2/1','A2/S2':'2/1','A2/E':'2/1','A2/P':'2/1','A3/M':'1/1','A3/R2':'2/1','A3/S1':'2/1','A3/S2':'2/1','A3/E':'NR/NR','A3/P':'2/1','M/R2':'2/1','M/S1':'2/1','M/S2':'1/NR','M/E':'NR/NR','M/P':'1/NR','R2/S1':'2/1','R2/S2':'2/1','R2/E':'2/1','R2/P':'2/1','S1/S2':'NR/NR','S1/E':'2/1','S1/P':'1/NR','S2/E':'2/1','S2/P':'1/NR','E/P':'1/NR'};
+var liveLLMap={'B':50,'A2':100,'A3':100,'M':100,'R2':40,'S1':125,'S2':125,'E':40,'P':40};
+function getSep(g1,g2,spr){if(g1===g2)return 'NR';var k=g1+'/'+g2,k2=g2+'/'+g1,v=sepTable[k]||sepTable[k2]||'2/1';return spr?v.split('/')[1]:v.split('/')[0];}
+var state={floors:[],ctype:'',sprinklers:true,occLoads:[],completed:[]};
+var codeContent={
+  IBC:{s1:{ref:'IBC §202 · Ch. 3 · §303–§312 · Table 1004.5',qt:'What is the intended use of each floor, how large is each floor, and how high above grade does each floor sit? These three inputs determine the occupancy group, the occupant load, and which §903.2 sprinkler triggers apply per floor.',bref:'§202 defines "story above grade plane" and "gross floor area." §302.1 requires every building to be classified by occupancy group. Read §303 (Assembly A), §304 (Business B), §305 (Educational E), §309 (Mercantile M), §310 (Residential R), §311 (Storage S) until the description matches each space.'},
+  s2:{title:'Select construction type — Table 601',ref:'IBC Chapter 6 · §601 · §602 · Table 601',qt:'What material is the structure built from and are its elements fire-protected?',bref:'Open Table 601. Rows = structural elements. Columns = construction types (I-A through V-B). Find your column, read hours per element. "0" = no rating required. Types I–II = non-combustible. Types III–V = combustible allowed. Sub-type A = fire-protected; B = unprotected.'},
+  s3:{title:'Check allowable height and area — Tables 504.3 & 506.2',ref:'IBC §503 · §504 · §506 · §506.3',qt:'Is the building within the IBC limits for story count and floor area per story for the most restrictive occupancy group and construction type?',bref:'Table 504.3 = max stories. Table 504.4 = max height in feet. Table 506.2 = max area per story. Find row for your most restrictive occupancy group, column for your construction type. §506.3: multiply Table 506.2 by 3 with NFPA 13 sprinklers throughout.'},
+  s4:{title:'Test every §903.2 sprinkler trigger per floor',ref:'IBC §903.2 · §903.3.1.1 (NFPA 13)',qt:'Does ANY condition in §903.2 require sprinklers? One satisfied trigger = NFPA 13 required throughout the entire building.',bref:'Turn to §903.2. Test each condition: §903.2.1.1 — any floor over 55 ft above grade? §903.2.1.2 — 3+ stories or assembly above exit-discharge floor? §903.2.1.3 — fire area over threshold? §903.2.8 — R-2 with 4+ stories? One "yes" triggers NFPA 13 throughout.'},
+  s5:{title:'Calculate occupant load per floor — Table 1004.5',ref:'IBC §1004 · Table 1004.5',qt:'How many people does the IBC assume occupy each floor? This drives exit count, exit width, and egress layout.',bref:'Table 1004.5: find function in left column, read load factor (gross or net sf/person). Divide floor area by factor (round up). Key: Business = 150 gross, Assembly standing = 5 gross, Assembly tables+chairs = 15 net, Retail = 60 gross, Residential = 200 gross.'},
+  s6:{title:'Determine exits per floor — §1006 and Table 1006.3.4',ref:'IBC §1006 · Table 1006.3.4 · §1005.1',qt:'How many separate exits must each floor have, and how wide must each exit component be?',bref:'§1006.1: default = two exits. Table 1006.3.4: ONE exit permitted only when occupant count AND common path distance are both at or below table values. §1005.1: stair = 0.2 in/person (min 44" for 50+ occupants). Door/corridor = 0.15 in/person (min 32" clear).'},
+  s7:{title:'Set travel distance and common path limits — Table 1017.2',ref:'IBC §1006.2.1 · §1017 · Table 1017.2 · §1020.4',qt:'What is the maximum walking distance from the most remote point in any room to the nearest exit?',bref:'Table 1017.2: find your occupancy group row. Read sprinklered or unsprinklered column. §1006.2.1: common path = the single-direction portion before the path branches. §1020.4: dead-end corridors limited to 20 ft (50 ft if sprinklered).'},
+  s8:{title:'Determine fire separations — §508.4 and Table 508.4',ref:'IBC §508 · §508.4 · Table 508.4 · §707 · §711',qt:'Where two different occupancy groups meet at a wall or floor/ceiling, what fire-resistance rating is required?',bref:'Table 508.4 is a grid. Find Group 1 on left, Group 2 at top. Read cell: NR = not required, 1 = 1-hr, 2 = 2-hr. Two values: without sprinklers / with sprinklers. §707 = rated walls. §711 = rated horizontal assemblies between stacked groups.'},
+  s9:{title:'Assign structural live loads per floor — Table 1607.1',ref:'IBC §1602 · §1607 · Table 1607.1 · §1015 · Table 1607.8',qt:'What minimum live load in PSF must the structural engineer design each floor and roof to carry?',bref:'Table 1607.1: use description on left, PSF on right. Key: Office = 50, Lobbies = 100, Assembly standing = 100, Retail = 100, Residential = 40, Roof maintenance = 20. Table 1607.8: guardrails = 200 lb concentrated at top + 50 lb/ft linear.'},
+  s10:{title:'Identify required special inspections — §1705',ref:'IBC §1701–§1709 · §1705.2–§1705.18',qt:'Which work types require an independent approved agency to observe and certify — separate from the normal building department inspection process?',bref:'Turn to §1705. Each subsection covers one work type. "Continuous" = inspector present throughout. "Periodic" = scheduled visits. The architect lists all applicable §1705 items on the permit drawings cover sheet. The owner hires the approved inspection agency before that work begins.'}},
+  IRC:{s1:{ref:'IRC §R101.2 · §R102 · §R201 · §R301',qt:'What type of dwelling, how many stories, floor area, bedrooms, and bathrooms? The IRC covers 1- and 2-family dwellings and townhouses ≤ 3 stories.',bref:'§R101.2 scope: detached one- and two-family dwellings and townhouses not more than 3 stories above grade. §R102.7: if any condition falls outside IRC scope, IBC provisions govern. §R301: design criteria — structure must resist gravity, wind, seismic, and snow loads specific to the location.'},
+  s2:{title:'Construction method and materials — IRC Chapter 6',ref:'IRC §R601 · §R602 (wood) · §R603 (cold-formed steel) · §R606 (masonry)',qt:'What framing method will be used? The IRC provides prescriptive construction rules — no engineering required if tables are followed exactly.',bref:'Chapter 6 is the core framing chapter. §R602: conventional wood-frame construction. Tables R602.3–R602.10 give stud sizes, spacing, and heights. §R802: roof framing. §R502: floor framing. §R602.7: headers over openings. Prescriptive path = follow tables, no structural engineer required.'},
+  s3:{title:'Minimum room sizes and ceiling heights — §R303–§R305',ref:'IRC §R303 · §R304 · §R305',qt:'Does each habitable room meet the minimum size and ceiling height requirements of the IRC?',bref:'§R303.1: natural light — glazed area ≥ 8% of floor area. §R303.3: natural ventilation — openable area ≥ 4% (or mechanical). §R304.1: at least one room ≥ 120 sf. Other habitable rooms ≥ 70 sf. §R305.1: minimum ceiling height = 7 ft in habitable rooms. Beams/girders may project to 6 ft 4 in.'},
+  s4:{title:'Smoke alarms, CO alarms, and fire sprinklers — §R314–§R316',ref:'IRC §R314 · §R315 · §R316 · §R313',qt:'Where are smoke alarms, CO detectors, and fire sprinklers required?',bref:'§R314.3: smoke alarms in each sleeping room, outside each sleeping area, on every story — interconnected. §R315.1: CO alarms outside each sleeping area and on each story (if fuel-fired appliances or attached garage). §R313: sprinklers — verify local adoption. IRC 2021 §R313.1 requires sprinklers for all new 1- and 2-family dwellings, but many states have opted out. IRC 2018 §R313.2 requires only for townhouses.'},
+  s5:{title:'Means of egress — §R310 (emergency escape windows)',ref:'IRC §R310 · §R311',qt:'Every sleeping room and basement must have an emergency escape and rescue opening. What are the minimum dimensions?',bref:'§R310.1: emergency escape required in every sleeping room and basement. §R310.2: min net clear area = 5.7 sf (5.0 sf grade floor). Min height = 24 inches. Min width = 20 inches. Max sill height = 44 inches AFF. §R311.2: primary exit door ≥ 3 ft wide × 6 ft 8 in tall. §R311.7: stairs — min 36" width, max 8¾" riser, min 9" tread, min 6 ft 8 in headroom.'},
+  s6:{title:'Stairway requirements — §R311.7',ref:'IRC §R311.7',qt:'What are the dimensional requirements for interior and exterior stairs?',bref:'§R311.7.4.1: max riser = 8¾ in. §R311.7.5.1: min tread depth = 9 in. §R311.7.3: min width = 36 in clear. §R311.7.8.1: handrail 34–38 in above nosing. §R311.7.8: required for 4+ risers. §R311.7.2: min 6 ft 8 in headroom from sloped nosing line. §R311.7.9.1: open risers must not allow a 4-inch sphere to pass.'},
+  s7:{title:'Guardrail requirements — §R312',ref:'IRC §R312',qt:'Where are guards required and what are the minimum heights and opening limitations?',bref:'§R312.1: guards required where surfaces are more than 30 in above floor or grade. §R312.1.2: minimum height = 36 in. §R312.1.3: guards at stairs = 34 in above nosing. §R312.1.4: openings must not allow a 4-inch sphere below 34 in. No horizontal rails in the 0–34 in zone (no ladder-like pattern).'},
+  s8:{title:'Bathroom, kitchen, and plumbing requirements — Chapter 26',ref:'IRC §P2705 · §P2709 · §P2902 · Chapter 26',qt:'What are the minimum clearances, fixture dimensions, and installation requirements for bathrooms and kitchens?',bref:'§P2705: WC clearances — 15 in center to side wall, 21 in clear in front. §P2709: shower minimum 900 sq in (30"×30"). §P2708.1: shower headroom min 6 ft 8 in. §E3902: GFCI required at all bathroom receptacles and kitchen countertop receptacles within 6 ft of sink. §E3902.12: AFCI required on bedroom circuits.'},
+  s9:{title:'Energy code — IRC Chapter 11 / IECC',ref:'IRC §N1101–§N1107 · IECC · Table N1102.1.2',qt:'What are the minimum insulation R-values, window U-factors, and air sealing requirements for the building envelope?',bref:'Find your climate zone in Figure N1101.7. Table N1102.1.2 provides minimum R-values for ceiling/attic, walls, floors, slab, and basement. Also provides maximum window U-factors. IRC 2021 vs. 2018: 2021 increased wall insulation requirements in Climate Zones 4–8 and tightened blower door test to 3 ACH50. For Climate Zones 1–3, differences between the two editions are minimal.'},
+  s10:{title:'Foundation requirements — §R401–§R408',ref:'IRC §R401 · §R403 · §R404 · §R405 · §R408',qt:'What are the minimum foundation depth, footing size, and drainage requirements?',bref:'§R401.4: assumed soil bearing = 1,500 PSF unless report specifies otherwise. §R403.1: footings below frost depth — find frost depth in Table R301.2. Table R403.1: min footing width and thickness by number of stories. §R405: foundation drainage — drain tile at footing level. §R408.1: crawl space ventilation per table or conditioned per §R408.3. §R403.1.6: anchor bolts — ½" × 10" @ max 6 ft o.c.'}}
+};
+function floorLabel(i){return['1st floor (grade)','2nd floor','3rd floor','4th floor','5th floor','6th floor','7th floor','8th floor','9th floor'][i]||'Floor '+(i+1);}
+function renderFloorTable(){
+  var f=state.floors,h='';
+  if(f.length===0){h='<tr><td colspan="5" style="text-align:center;padding:14px;color:var(--text-muted);font-size:13px">No floors — click "+ Add floor" to begin</td></tr>';}
+  else{f.forEach(function(fl,i){h+='<tr><td><span class="floor-name">'+floorLabel(i)+'</span></td><td><select onchange="floorUse('+i+',this.value)">';Object.keys(ibcUseData).forEach(function(u){h+='<option value="'+u+'"'+(fl.use===u?' selected':'')+'>'+ibcUseData[u].label+'</option>';});h+='</select></td><td><input type="number" min="100" max="80000" value="'+fl.area+'" onchange="floorArea('+i+',this.value)"></td><td><input type="number" min="0" max="800" value="'+fl.ht+'" onchange="floorHt('+i+',this.value)"></td><td><span class="fbadge fb-'+fl.use+'">'+fl.use+'</span></td></tr>';});}
+  document.getElementById('floor-tbody').innerHTML=h;
+  document.getElementById('floor-count-lbl').textContent=f.length+' floor'+(f.length!==1?'s':'')+' defined';
+  document.getElementById('btn-rm').disabled=f.length<=0;
+  checkWarn();
+}
+function floorUse(i,v){state.floors[i].use=v;renderFloorTable();}
+function floorArea(i,v){state.floors[i].area=Math.max(100,parseInt(v)||500);}
+function floorHt(i,v){state.floors[i].ht=Math.max(0,parseInt(v)||0);checkWarn();}
+function checkWarn(){var w='';if(state.floors.some(function(f){return f.ht>55;}))w='<div class="ob ob-warn"><div class="ob-title">Floor above 55 ft detected</div><div class="ob-body">§903.2.1.1 will trigger sprinklers for height-sensitive groups. Evaluated in Step 4.</div></div>';document.getElementById('floor-warn').innerHTML=w;}
+function addFloor(){if(state.floors.length>=9)return;var n=state.floors.length,ph=n>0?state.floors[n-1].ht:0,pu=n>0?state.floors[n-1].use:'B';state.floors.push({use:pu,area:2500,ht:ph+(n===0?0:14)});renderFloorTable();}
+function removeFloor(){if(state.floors.length>0){state.floors.pop();renderFloorTable();}}
+function getMR(){var priority=['A2','A3','R2','E','M','S1','S2','B','P'],groups=state.floors.map(function(f){return f.use;});for(var i=0;i<priority.length;i++){if(groups.indexOf(priority[i])>=0)return priority[i];}return groups[0]||'B';}
+function ctypeChange(){state.ctype=document.getElementById('ctype').value;if(!state.ctype){document.getElementById('ctype-out').style.display='none';return;}var d=ctypeData[state.ctype];document.getElementById('ctype-out').style.display='block';document.getElementById('ctype-title').textContent=d.name+' — '+d.fr;document.getElementById('ctype-body').textContent=d.note;}
+function sprChoiceChange(){state.sprinklers=document.getElementById('spr-choice').value==='yes';var el=document.getElementById('spr-choice-out');el.style.display='block';el.innerHTML=state.sprinklers?'<div class="ob ob-pass"><div class="ob-title">NFPA 13 throughout — code benefits applied</div><div class="ob-body">Area allowance ×3 (§506.3). Travel distance and common path: sprinklered column. Dead-end corridors: 50 ft.</div></div>':'<div class="ob ob-warn"><div class="ob-title">No sprinklers — reduced allowances apply</div><div class="ob-body">Base Table 506.2 area only. Unsprinklered travel distances. Dead-end corridors: 20 ft. Verify all §903.2 triggers are clear.</div></div>';}
+function selectCode(code){
+  activeCode=code;isIRC=code.startsWith('IRC');
+  document.querySelectorAll('.cp-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('cp-'+code).classList.add('selected');
+  document.getElementById('banner-ibc').style.display='none';
+  document.getElementById('banner-irc').style.display='none';
+  if(isIRC){document.getElementById('banner-irc').style.display='block';var yr=code.replace('IRC','');document.getElementById('banner-title-irc').textContent='IRC '+yr+' — International Residential Code';document.getElementById('banner-note-irc').textContent='Covers 1- and 2-family dwellings and townhouses ≤ 3 stories. Prescriptive path — no engineering calculations required if IRC tables are followed.';}
+  else{document.getElementById('banner-ibc').style.display='block';var yr=code.replace('IBC','');document.getElementById('banner-title').textContent='IBC '+yr+' — International Building Code';document.getElementById('banner-note').textContent=yr==='2018'?'IBC 2018: §903.2.1.3 fire area threshold for Group B = 12,000 sf. §506.3 area multiplier = 3. Most requirements identical to IBC 2021.':'IBC 2021: Updated §903.2 sprinkler thresholds and revised Table 506.2 area values vs. 2018.';}
+  resetWorkbook();document.getElementById('workbook-area').style.display='block';populateStep1();populateStepMeta();document.getElementById('workbook-area').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function populateStep1(){
+  var cc=codeContent[isIRC?'IRC':'IBC'];
+  document.getElementById('s1-ibc-ref').textContent=cc.s1.ref;
+  var qb=document.getElementById('s1-qblock');qb.className='qblock '+(isIRC?'qb-irc':'qb-ibc');
+  document.getElementById('s1-qlabel').textContent=isIRC?'IRC question':'IBC question';
+  document.getElementById('s1-qtext').textContent=cc.s1.qt;
+  document.getElementById('s1-bref').textContent=cc.s1.bref;
+  document.getElementById('ibc-floor-section').style.display=isIRC?'none':'block';
+  document.getElementById('irc-dwelling-section').style.display=isIRC?'block':'none';
+  document.getElementById('btn-step1').className='btn '+(isIRC?'btng':'btnp');
+  if(!isIRC)renderFloorTable();
+}
+function populateStepMeta(){
+  var cc=codeContent[isIRC?'IRC':'IBC'];
+  for(var i=2;i<=10;i++){var sd=cc['s'+i];if(sd){['title','ibc','ql','qt','bref'].forEach(function(f){var el=document.getElementById('s'+i+(f==='ibc'?'-ibc':f==='title'?'-title':'-'+f));if(el)el.textContent=f==='ibc'?sd.ref||'':f==='title'?sd.title||'':f==='ql'?(isIRC?'IRC question':'IBC question'):f==='qt'?sd.qt||'':sd.bref||'';});var qb=document.getElementById('s'+i+'-qblock');if(qb)qb.className='qblock '+(isIRC?'qb-irc':'qb-ibc');}}
+  document.getElementById('s2-ibc-sel').style.display=isIRC?'none':'block';
+  document.getElementById('s2-irc-content').style.display=isIRC?'block':'none';
+  document.getElementById('s4-spr-choice-row').style.display=isIRC?'none':'block';
+  var b2=document.getElementById('btn-s2');if(b2)b2.className='btn '+(isIRC?'btng':'btnp');
+}
+function runStep(n){if(isIRC){runIRCStep(n);return;}if(n===3)runHA();else if(n===4)runSpr();else if(n===5)runOcc();else if(n===6)runExit();else if(n===7)runTD();else if(n===8)runSep();else if(n===9)runLoad();else if(n===10)runSI();}
+function runHA(){
+  if(!state.ctype||!state.floors.length){document.getElementById('s3-out').innerHTML='<div class="ob ob-warn"><div class="ob-body">Complete Steps 1 and 2 first.</div></div>';return;}
+  var mr=getMR(),ct=ctypeData[state.ctype],n=state.floors.length,maxS=ct.maxS[mr]||2,baseA=ct.baseA[mr]||9000,sprA=baseA*3,largest=Math.max.apply(null,state.floors.map(function(f){return f.area;}));
+  var stOk=(maxS>=999)||n<=maxS,aOkN=largest<=baseA,aOkS=largest<=sprA,yr=activeCode.replace('IBC','');
+  var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Check</div><div class="tgc b w130">IBC '+yr+' limit</div><div class="tgc b w100">This building</div><div class="tgc b w70">Result</div></div>';
+  h+='<div class="tgr '+(stOk?'ok':'bad')+'"><div class="tgc">Max stories — '+ct.name+' / '+ibcUseData[mr].group+' (Table 504.3)</div><div class="tgc w130">'+(maxS>=999?'Unlimited':maxS+' stories')+'</div><div class="tgc w100">'+n+' stories</div><div class="tgc w70 '+(stOk?'pass':'fail')+'">'+(stOk?'Pass':'FAIL')+'</div></div>';
+  h+='<div class="tgr '+(aOkN?'ok':'warn')+'"><div class="tgc">Max area/floor — unsprinklered (Table 506.2)</div><div class="tgc w130">'+baseA.toLocaleString()+' sf</div><div class="tgc w100">'+largest.toLocaleString()+' sf</div><div class="tgc w70 '+(aOkN?'pass':'warn')+'">'+(aOkN?'Pass':'Over')+'</div></div>';
+  h+='<div class="tgr '+(aOkS?'ok':'bad')+'"><div class="tgc">Max area/floor — NFPA 13 sprinklered (×3 §506.3)</div><div class="tgc w130">'+sprA.toLocaleString()+' sf</div><div class="tgc w100">'+largest.toLocaleString()+' sf</div><div class="tgc w70 '+(aOkS?'pass':'fail')+'">'+(aOkS?'Pass':'FAIL')+'</div></div>';
+  h+='</div>';
+  if(!stOk)h+='<div class="ob ob-fail"><div class="ob-title">Story count exceeds limit</div><div class="ob-body">Reduce floors to '+maxS+', upgrade construction type, or change the most restrictive occupancy group.</div></div>';
+  else if(!aOkN&&aOkS)h+='<div class="ob ob-warn"><div class="ob-title">Area exceeds unsprinklered limit — sprinklers required for §506.2</div><div class="ob-body">Largest floor '+largest.toLocaleString()+' sf exceeds '+baseA.toLocaleString()+' sf. With NFPA 13 the limit triples to '+sprA.toLocaleString()+' sf.</div></div>';
+  else if(!aOkN&&!aOkS)h+='<div class="ob ob-fail"><div class="ob-title">Area exceeds even the sprinklered limit</div><div class="ob-body">Reduce floor area or upgrade construction type.</div></div>';
+  else h+='<div class="ob ob-pass"><div class="ob-title">Within allowable height and area limits</div><div class="ob-body">'+n+' stories ≤ '+maxS+' allowed. Largest floor '+largest.toLocaleString()+' sf ≤ '+baseA.toLocaleString()+' sf unsprinklered limit.</div></div>';
+  document.getElementById('s3-out').innerHTML=h;
+}
+function runSpr(){
+  var f=state.floors,n=f.length,t=[];
+  if(f.some(function(fl){return ibcUseData[fl.use].hT&&fl.ht>55;}))t.push({txt:'Any floor >55 ft — §903.2.1.1',v:true,note:'Occupied floor with height-triggered group exceeds 55 ft'});
+  if(f.some(function(fl){return ibcUseData[fl.use].s3T&&n>=3;}))t.push({txt:'3+ stories with triggered group — §903.2.1.2',v:true,note:n+' stories with an occupancy group that has a 3-story trigger'});
+  if(f.some(function(fl,i){return (fl.use==='A2'||fl.use==='A3')&&i>0;}))t.push({txt:'Assembly above exit-discharge floor — §903.2.1.2',v:true,note:'A-2 or A-3 occupancy above grade level'});
+  if(f.some(function(fl){return ibcUseData[fl.use].aT>0&&fl.area>ibcUseData[fl.use].aT;}))t.push({txt:'Fire area exceeds group threshold — §903.2.1.3',v:true,note:'A floor area exceeds the §903.2 threshold for its group'});
+  if(f.some(function(fl){return fl.use==='R2'&&n>=4;}))t.push({txt:'R-2 with 4+ stories — §903.2.8',v:true,note:'Multi-family residential over 3 stories'});
+  var req=t.some(function(x){return x.v;});
+  if(!t.length)t.push({txt:'No base IBC §903.2 trigger found',v:false,note:'Verify local amendments before designing without sprinklers'});
+  var yr=activeCode.replace('IBC','');
+  var h='<div class="tgrid"><div class="tgh"><div class="tgc b">§903.2 trigger (IBC '+yr+')</div><div class="tgc b w100">Triggered?</div></div>';
+  t.forEach(function(x){h+='<div class="tgr '+(x.v?'bad':'ok')+'"><div class="tgc">'+x.txt+'<br><span style="font-size:11px;color:var(--text-muted)">'+x.note+'</span></div><div class="tgc w100 '+(x.v?'fail':'pass')+'">'+(x.v?'YES — required':'No')+'</div></div>';});
+  h+='</div>';
+  h+=req?'<div class="ob ob-fail"><div class="ob-title">Sprinklers required — NFPA 13 throughout</div><div class="ob-body">At least one §903.2 condition is met. Extends to all floors. Submit as deferred to fire department.</div></div>':'<div class="ob ob-warn"><div class="ob-title">No base IBC '+yr+' §903.2 trigger found</div><div class="ob-body">Confirm with local building official and fire marshal in writing — local amendments frequently lower these thresholds.</div></div>';
+  document.getElementById('s4-out').innerHTML=h;
+  sprChoiceChange();
+}
+function runOcc(){
+  var f=state.floors,loads=[],h='<div class="tgrid"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w70">Group</div><div class="tgc b">Area</div><div class="tgc b w110">Load factor</div><div class="tgc b w90">Occupants</div></div>';
+  f.forEach(function(fl,i){var ud=ibcUseData[fl.use],occ=Math.ceil(fl.area/ud.lf);loads.push(occ);h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w70">'+fl.use+'</div><div class="tgc">'+fl.area.toLocaleString()+' sf</div><div class="tgc w110">'+ud.lf+' '+ud.lt+' sf/person</div><div class="tgc w90 b pass">'+occ+' persons</div></div>';});
+  h+='</div>';var tot=loads.reduce(function(a,b){return a+b;},0);
+  h+='<div class="ob ob-info"><div class="ob-title">Total design occupancy: '+tot+' persons</div><div class="ob-body">These values drive all exit width, exit count, and travel distance calculations. Also used for IPC plumbing fixture counts and IMC ventilation rates.</div></div>';
+  document.getElementById('s5-out').innerHTML=h;state.occLoads=loads;
+}
+function runExit(){
+  var f=state.floors,spr=state.sprinklers,h='<div class="tgrid"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w80">Occupants</div><div class="tgc b w100">1-exit limit</div><div class="tgc b w100">Exits needed</div><div class="tgc b w90">Min width</div></div>';
+  f.forEach(function(fl,i){var ud=ibcUseData[fl.use],occ=state.occLoads[i]||Math.ceil(fl.area/ud.lf),lim=i===0?(spr?ud.el1:Math.floor(ud.el1*0.65)):(spr?ud.el2:Math.floor(ud.el2*0.65)),exits=occ>lim?2:1,mw=Math.max(32,Math.ceil(occ*0.15));h+='<div class="tgr '+(exits===1?'ok':'warn')+'"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w80">'+occ+'</div><div class="tgc w100">'+lim+' persons</div><div class="tgc w100 '+(exits===1?'pass':'warn b')+'">'+exits+' exit'+(exits>1?'s':'')+' req\'d</div><div class="tgc w90">'+mw+'" clear</div></div>';});
+  h+='</div><div class="ob ob-info"><div class="ob-title">§1005.1 stair width</div><div class="ob-body">Stairs serving >50 occupants: min 44" clear. Serving ≤50: min 36". Formula: 0.2 in × occupant count. Use the larger of formula or minimum.</div></div>';
+  document.getElementById('s6-out').innerHTML=h;
+}
+function runTD(){
+  var f=state.floors,spr=state.sprinklers,h='<div class="tgrid"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w70">Group</div><div class="tgc b w110">Max travel dist.</div><div class="tgc b w110">Max common path</div><div class="tgc b w90">Dead-end max</div></div>';
+  f.forEach(function(fl,i){var ud=ibcUseData[fl.use],td=spr?ud.tdS:ud.tdN,cp=spr?ud.cpS:ud.cpN,de=spr?50:20;h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w70">'+fl.use+'</div><div class="tgc w110 b pass">'+td+' ft</div><div class="tgc w110 b '+(cp<100?'warn':'pass')+'">'+cp+' ft</div><div class="tgc w90">'+de+' ft</div></div>';});
+  h+='</div><div class="ob ob-info"><div class="ob-title">Applying these limits on the floor plan</div><div class="ob-body">Travel distance: trace the actual walking path from the most remote corner to the nearest exit door. Common path: the single-direction segment before the corridor branches to two exits.</div></div>';
+  document.getElementById('s7-out').innerHTML=h;
+}
+function runSep(){
+  var f=state.floors,spr=state.sprinklers,groups=[...new Set(f.map(function(fl){return fl.use;}))],h='';
+  if(groups.length===1){h='<div class="ob ob-pass"><div class="ob-title">Single occupancy group ('+ibcUseData[groups[0]].group+') — no fire separation required</div><div class="ob-body">§508.1: a single-group building requires no rated separations. Table 508.4 applies only when two different occupancy groups share the building.</div></div><div class="ob ob-info"><div class="ob-title">How to use Table 508.4 if a second use is added</div><div class="ob-body">Table 508.4 is a grid — rows and columns are both occupancy groups. Find Group 1 on the left, Group 2 at top. Read cell: NR = not required, 1 = 1-hr, 2 = 2-hr. Two values: without sprinklers / with sprinklers. Use §707 for rated walls, §711 for horizontal assemblies between stacked groups.</div></div>';}
+  else{h='<div class="tgrid"><div class="tgh"><div class="tgc b">Floor boundary</div><div class="tgc b">Groups</div><div class="tgc b w130">Required separation</div></div>';var done=[];for(var i=0;i<f.length-1;i++){var g1=f[i].use,g2=f[i+1].use;if(g1!==g2){var key=g1+'|'+g2;if(done.indexOf(key)<0){done.push(key);var sep=getSep(g1,g2,spr),isNR=sep==='NR',is2=sep==='2hr';h+='<div class="tgr '+(isNR?'ok':is2?'bad':'warn')+'"><div class="tgc">'+floorLabel(i)+' / '+floorLabel(i+1)+'</div><div class="tgc">'+g1+' ↔ '+g2+'</div><div class="tgc w130 b '+(isNR?'pass':is2?'fail':'warn')+'">'+sep+' horizontal assembly (§711)</div></div>';}}}h+='</div><div class="ob ob-info"><div class="ob-title">Rated horizontal assembly in practice</div><div class="ob-body">A 1-hour assembly typically requires intumescent spray or board fireproofing on the steel, plus 5/8" Type X gypsum ceiling board. All penetrations require UL-listed firestop per §1705.18. Special inspection required per §1705.16 and §1705.18.</div></div>';}
+  document.getElementById('s8-out').innerHTML=h;
+}
+function runLoad(){
+  var f=state.floors,h='<div class="tgrid"><div class="tgh"><div class="tgc b">Floor</div><div class="tgc b w70">Group</div><div class="tgc b w130">Required live load</div><div class="tgc b">Reference</div></div>';
+  f.forEach(function(fl,i){var ll=liveLLMap[fl.use]||50,lobby=(i===0)&&ll<100,finalLL=lobby?100:ll;h+='<div class="tgr hi"><div class="tgc">'+floorLabel(i)+'</div><div class="tgc w70">'+fl.use+'</div><div class="tgc w130 b pass">'+finalLL+' PSF'+(lobby?' (lobby min)':'')+'</div><div class="tgc">Table 1607.1</div></div>';});
+  h+='<div class="tgr"><div class="tgc">Roof — maintenance access only</div><div class="tgc w70">—</div><div class="tgc w130 b">20 PSF</div><div class="tgc">Table 1607.1</div></div><div class="tgr warn"><div class="tgc">Roof — assembly or occupied terrace</div><div class="tgc w70">A-2/A-3</div><div class="tgc w130 b fail">100 PSF</div><div class="tgc">Table 1607.1</div></div><div class="tgr"><div class="tgc">All stairs and exit corridors</div><div class="tgc w70">—</div><div class="tgc w130 b">100 PSF</div><div class="tgc">Table 1607.1</div></div><div class="tgr"><div class="tgc">Guardrail concentrated load</div><div class="tgc w70">—</div><div class="tgc w130 b">200 lb at top + 50 lb/ft</div><div class="tgc">Table 1607.8</div></div></div><div class="ob ob-info"><div class="ob-title">These values go to the structural engineer of record</div><div class="ob-body">The engineer uses these as minimum design live loads for all structural members. Dead loads and ASCE 7-22 load combinations (wind, seismic, snow) are added per IBC §1601.1.</div></div>';
+  document.getElementById('s9-out').innerHTML=h;
+}
+function runSI(){
+  var yr=activeCode.replace('IBC',''),si=[['§1705.2','Steel construction','Welds, bolts, frame joints','Continuous'],['§1705.3','Concrete construction','Rebar, mix design, slump, strength breaks','Continuous'],['§1705.4','Masonry','CMU reinforcing, grout, bond beams','Continuous'],['§1705.6','Soils','Excavation, compaction, fill','Periodic'],['§1705.8','Deep foundations (piers)','Drilling, diameter, depth, end bearing','Continuous'],['§1705.12','Wind resistance','Connections, fasteners','Periodic'],['§1705.16','Intumescent fire-resistance','Fireproofing thickness and adhesion','Continuous'],['§1705.18','Fire-resistant penetrations','Firestop at all rated assembly penetrations','Periodic']];
+  var h='<div class="tgrid"><div class="tgh"><div class="tgc b w90">IBC '+yr+' §</div><div class="tgc b w100">Type</div><div class="tgc b">What is inspected</div><div class="tgc b w100">Frequency</div></div>';
+  si.forEach(function(r){h+='<div class="tgr hi"><div class="tgc w90 b">'+r[0]+'</div><div class="tgc w100">'+r[1]+'</div><div class="tgc">'+r[2]+'</div><div class="tgc w100">'+r[3]+'</div></div>';});
+  h+='</div><div class="tgrid" style="margin-top:8px"><div class="tgh"><div class="tgc b">Deferred submittal</div><div class="tgc b w130">Submit to</div></div><div class="tgr hi"><div class="tgc">Engineered fire suppression shop drawings</div><div class="tgc w130">Fire marshal / AHJ</div></div><div class="tgr"><div class="tgc">Roof truss shop drawings</div><div class="tgc w130">Building official</div></div><div class="tgr hi"><div class="tgc">Metal awnings and canopies</div><div class="tgc w130">Building official</div></div></div><div class="ob ob-info" style="margin-top:8px"><div class="ob-title">§1705.1.1 — owner responsibility</div><div class="ob-body">The owner employs and pays the approved special inspection agency. All reports submitted to the building official throughout construction. No certificate of occupancy until all reports confirm compliance.</div></div>';
+  document.getElementById('s10-out').innerHTML=h;
+}
+function runIRCStep(n){
+  var out=document.getElementById('s'+n+'-out');if(!out)return;
+  if(n===2){
+    var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Framing parameter</div><div class="tgc b">IRC '+activeCode.replace('IRC','')+' requirement</div><div class="tgc b w90">Reference</div></div>';
+    [['Wall stud size (std 8–10 ft)','2×4 @ 16" o.c. or 2×6 @ 24" o.c.','Table R602.3'],['Max stud height (2×4 @ 16")','10 ft (engineer if taller)','Table R602.3.1'],['Exterior wall sheathing','Min 3/8" structural panel per table','Table R602.3'],['Floor joist sizing','Per Table R502.3.1 by span and species/grade','Table R502.3.1'],['Roof rafter sizing','Per Table R802.4.1 by span and pitch','Table R802.4.1'],['Header over openings','Per Table R602.7 by span and load path','Table R602.7'],['Anchor bolts — sill to foundation','½" × 10" min @ 6 ft o.c., within 12" of ends','§R403.1.6']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div><div class="ob ob-green"><div class="ob-title">Prescriptive path — no engineering calculations required if tables are followed</div><div class="ob-body">If the dwelling stays within the IRC scope (≤3 stories, conventional light-frame, within the geographic and loading conditions of the tables), the contractor builds directly from table values without a structural engineer. Any deviation requires engineered design by a licensed structural engineer.</div></div>';
+    document.getElementById('s2-irc-out').innerHTML=h;
+  } else if(n===3){
+    var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Room requirement</div><div class="tgc b">IRC minimum</div><div class="tgc b w90">Section</div></div>';
+    [['At least one habitable room','120 sf minimum floor area','§R304.1'],['All other habitable rooms','70 sf minimum each','§R304.2'],['Minimum room dimension','7 ft in any horizontal direction','§R304.3'],['Habitable room ceiling height','7 ft minimum (6 ft 4 in under beams)','§R305.1'],['Bathroom ceiling height','6 ft 8 in at shower/tub area','§R305.1'],['Natural light — habitable rooms','Glazed area ≥ 8% of floor area','§R303.1'],['Natural ventilation','Openable area ≥ 4% of floor area (or mech.)','§R303.3–§R303.4'],['Bathroom ventilation','Exhaust fan if no openable window','§R303.3']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===4){
+    var garage=document.getElementById('irc-garage').value,yr=activeCode.replace('IRC','');
+    var sprNote=yr==='2021'?'IRC 2021 §R313.1 requires sprinklers for all new 1- and 2-family dwellings, but adoption varies — many states have opted out. Verify with local AHJ.':'IRC 2018 §R313.2 requires sprinklers for townhouses. §R313.1 for 1- and 2-family dwellings is locally adopted — many jurisdictions have not adopted this section.';
+    var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Device / system</div><div class="tgc b">Requirement</div><div class="tgc b w90">IRC '+yr+' §</div></div>';
+    var items=[['Smoke alarms — sleeping rooms','Required inside each sleeping room','§R314.3'],['Smoke alarms — sleeping area','Required outside each separate sleeping area','§R314.3'],['Smoke alarms — each story','Required on every story including basement','§R314.3'],['Interconnection','All alarms interconnected — one triggers all','§R314.4'],['CO alarm — each sleeping area','Required outside each sleeping room','§R315.1'],['CO alarm — each story (2021)','Required on every story in IRC 2021','§R315.1']];
+    if(garage==='att')items.push(['CO alarm — attached garage','Required due to attached garage fuel source','§R315.1']);
+    items.push(['Fire sprinklers',sprNote,'§R313']);
+    items.forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===5){
+    var beds=parseInt(document.getElementById('irc-beds').value)||3,basement=document.getElementById('irc-basement').value,escCount=beds+(basement==='yes'?1:0);
+    var h='<div class="ob ob-info" style="margin-bottom:8px"><div class="ob-title">Emergency escape openings required: '+escCount+' locations</div><div class="ob-body">1 per sleeping room ('+beds+' bedrooms)'+(basement==='yes'?' + 1 for basement':' + no basement')+' = '+escCount+' required per §R310.1.</div></div>';
+    h+='<div class="tgrid"><div class="tgh"><div class="tgc b">Egress requirement</div><div class="tgc b">IRC minimum</div><div class="tgc b w90">Section</div></div>';
+    [['Emergency escape — net clear area','5.7 sf (5.0 sf at grade floor level)','§R310.2'],['Emergency escape — minimum height','24 inches net clear','§R310.2.1'],['Emergency escape — minimum width','20 inches net clear','§R310.2.2'],['Emergency escape — max sill height','44 inches above finished floor','§R310.2.3'],['Window well (if below grade)','9 sf min, 36" min projection','§R310.3.1'],['Primary exit door — width','3 ft (36 inches) minimum','§R311.2'],['Primary exit door — height','6 ft 8 in minimum','§R311.2'],['Landing at exterior door','Level, same width as door, ≥36" depth','§R311.3']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===6){
+    var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Stair dimension</div><div class="tgc b">IRC minimum / maximum</div><div class="tgc b w90">Section</div></div>';
+    [['Stair width — clear','36 inches minimum','§R311.7.1'],['Maximum riser height','8¾ inches','§R311.7.4.1'],['Minimum tread depth','9 inches','§R311.7.5.1'],['Handrail height range','34–38 inches above tread nosing','§R311.7.8.1'],['Handrail — required when','4 or more risers on any stair','§R311.7.8'],['Headroom — minimum','6 ft 8 in from sloped nosing line','§R311.7.2'],['Open risers — sphere test','Must not allow a 4" sphere to pass','§R311.7.5.1'],['Winders — minimum tread','6" at narrow end, 10" at 12" from narrow end','§R311.7.5.3']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===7){
+    var yr=activeCode.replace('IRC',''),h='<div class="tgrid"><div class="tgh"><div class="tgc b">Guard requirement</div><div class="tgc b">IRC '+yr+' minimum</div><div class="tgc b w90">Section</div></div>';
+    [['When required','Walking surface, stair, ramp or landing >30" above floor/grade','§R312.1'],['Minimum height — decks, floors','36 inches from walking surface','§R312.1.2'],['Minimum height — stairs','34 inches above stair nosing','§R312.1.3'],['Sphere test — bottom 34 inches','Openings must not allow a 4" sphere','§R312.1.4'],['Climbing deterrent','No horizontal rails between 0–34" height','§R312.1.4'],['Pool enclosure fence','Min 48" high, max 4" openings, self-closing gate','§R326']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===8){
+    var h='<div class="tgrid"><div class="tgh"><div class="tgc b">Fixture / clearance</div><div class="tgc b">IRC minimum</div><div class="tgc b w90">Section</div></div>';
+    [['Water closet — side wall','15" from centerline to wall or obstruction','§P2705.1'],['Water closet — front clearance','21 inches clear in front','§P2705.1'],['Shower — minimum floor area','900 sq in (30"×30" interior minimum)','§P2708.1'],['Shower — minimum headroom','6 ft 8 in from shower floor','§P2708.1'],['GFCI — bathrooms','All bathroom receptacles must be GFCI','§E3902.1'],['GFCI — kitchen countertops','All within 6 ft of sink must be GFCI','§E3902.2'],['AFCI — bedrooms','Arc-fault protection on bedroom circuits','§E3902.12'],['Water heater T&P valve','Required, discharge to safe location','§P2803.3']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  } else if(n===9){
+    var yr=activeCode.replace('IRC','');
+    var h='<div class="ob ob-info" style="margin-bottom:8px"><div class="ob-title">Find your climate zone first — Figure N1101.7 in the IRC book</div><div class="ob-body">Open Figure N1101.7, find your state and county, read the climate zone number (1–8). Then use Table N1102.1.2 for all R-values and U-factors for that zone.</div></div>';
+    h+='<div class="tgrid"><div class="tgh"><div class="tgc b">Component</div><div class="tgc b">Zone 2</div><div class="tgc b">Zone 3</div><div class="tgc b">Zone 4</div><div class="tgc b">Zone 5</div></div>';
+    [['Ceiling / attic','R-30','R-38','R-49','R-49'],['Wood-frame walls (cavity)','R-13','R-20 or 13+5','R-20 or 13+5','R-20 or 13+5'],['Floor over unconditioned space','R-13','R-19','R-19','R-30'],['Slab edge perimeter','NR','NR','R-10 / 2 ft','R-10 / 2 ft'],['Window U-factor (max)','0.40','0.30','0.30','0.27'],['Skylight U-factor (max)','0.65','0.65','0.65','0.65']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc">'+r[2]+'</div><div class="tgc">'+r[3]+'</div><div class="tgc">'+r[4]+'</div></div>';});
+    h+='</div><div class="ob ob-warn"><div class="ob-title">IRC 2021 vs. 2018 energy differences</div><div class="ob-body">IRC 2021 increased wall insulation in Climate Zones 4–8 and requires blower door test at 3 ACH50 for air sealing. Window U-factors in Zones 6–8 tightened. For Zones 1–3, differences are minimal.</div></div>';
+    out.innerHTML=h;
+  } else if(n===10){
+    var yr=activeCode.replace('IRC',''),h='<div class="tgrid"><div class="tgh"><div class="tgc b">Foundation element</div><div class="tgc b">IRC '+yr+' requirement</div><div class="tgc b w90">Section</div></div>';
+    [['Footing depth — frost protection','Below frost depth per Table R301.2 (varies by location)','§R403.1.4'],['Min footing width (1-story)','12" wide × 6" thick','Table R403.1'],['Min footing width (2-story)','15" wide × 7" thick','Table R403.1'],['Min footing width (3-story)','23" wide × 8" thick','Table R403.1'],['Soil bearing capacity assumed','1,500 PSF unless geotechnical report specifies otherwise','§R401.4'],['Foundation wall — concrete','6 inches thick minimum above grade','§R404.1'],['Foundation drainage','Drain tile or perforated pipe at footing level','§R405.1'],['Crawl space ventilation','1 sf vent per 150 sf floor area (or conditioned)','§R408.1'],['Anchor bolts — sill plate','½" × 10" @ max 6 ft o.c., within 12" of ends','§R403.1.6'],['Termite protection (south)','Pressure-treated lumber at soil contact','§R317/§R318']].forEach(function(r){h+='<div class="tgr gi"><div class="tgc b">'+r[0]+'</div><div class="tgc">'+r[1]+'</div><div class="tgc w90">'+r[2]+'</div></div>';});
+    h+='</div>';out.innerHTML=h;
+  }
+}
+function buildSummary(){
+  var name=document.getElementById('proj-name').value||'New project',city=document.getElementById('proj-city').value||'—';
+  document.getElementById('sum-title').textContent='Compliance summary — '+name;
+  var badgeEl=document.getElementById('sum-badge');badgeEl.textContent=activeCode.replace('IBC','IBC ').replace('IRC','IRC ');badgeEl.className='sum-code-badge '+(isIRC?'scb-irc':'scb-ibc');
+  var rows=[];
+  if(isIRC){var dtype=document.getElementById('irc-dtype'),stories=document.getElementById('irc-stories').value,area=document.getElementById('irc-area').value,beds=document.getElementById('irc-beds').value,baths=document.getElementById('irc-baths').value;rows=[['Project',''+name,'—'],['Location',''+city,'—'],['Code',activeCode.replace('IRC','IRC '),'§R101.2'],['Dwelling type',dtype?dtype.options[dtype.selectedIndex].text:'—','§R101.2'],['Stories',''+stories+' stories','§R301'],['Total floor area',parseInt(area).toLocaleString()+' sf','§R202'],['Bedrooms / bathrooms',beds+' bed / '+baths+' bath','—'],['Primary exit door','Min 36" wide × 6 ft 8 in tall','§R311.2'],['Emergency escape openings','1 per sleeping room + basement if present','§R310.1'],['Stair dimensions','Max 8¾" riser · Min 9" tread · Min 36" width','§R311.7'],['Guards required when','Walking surface >30" above grade','§R312.1'],['Smoke alarms','Each sleeping room + each story + outside sleeping areas','§R314.3'],['CO alarms','Each sleeping area + each story (IRC 2021)','§R315.1'],['Foundation frost depth','Per Table R301.2 for project location','§R403.1.4'],['Energy — climate zone','Verify via Figure N1101.7','Table N1102.1.2'],['Sprinklers','Verify local adoption of §R313','§R313']];document.getElementById('sum-next').innerHTML='1. Confirm local adoption of §R313 sprinkler requirement with local building official.<br>2. Verify frost depth from Table R301.2 for the project location.<br>3. Confirm climate zone from Figure N1101.7 and apply Table N1102.1.2 insulation values.<br>4. Submit for building permit: site plan, floor plans, elevations, sections.<br>5. Schedule required inspections: footing, framing, rough MEP, insulation, final.';}
+  else{var f=state.floors,spr=state.sprinklers,mr=getMR(),ct=ctypeData[state.ctype]||{name:'—',fr:'—'},total=f.reduce(function(a,fl){return a+fl.area;},0),largest=Math.max.apply(null,f.map(function(fl){return fl.area;})),totOcc=state.occLoads.reduce(function(a,b){return a+b;},0)||0,mrud=ibcUseData[mr]||{group:'—',tdS:300,tdN:200,cpS:100,cpN:75},td=spr?mrud.tdS:mrud.tdN,cp=spr?mrud.cpS:mrud.cpN,groups=[...new Set(f.map(function(fl){return fl.use;}))];rows=[['Project',''+name,'—'],['Location',''+city,'—'],['Code',activeCode.replace('IBC','IBC '),'§101.4'],['Stories / total area',f.length+' stories · '+total.toLocaleString()+' sf','§202'],['Largest floor',largest.toLocaleString()+' sf','§202'],['Occupancy groups',groups.map(function(g){return ibcUseData[g]?ibcUseData[g].group:g;}).join(' · '),'Chapter 3'],['Most restrictive group',mrud.group,'§302.1'],['Construction type',ct.name+' — '+ct.fr,'Table 601'],['Sprinkler system',spr?'NFPA 13 throughout (§903.3.1.1)':'None — verify §903.2 + local amendments','§903'],['Total design occupancy',totOcc+' persons','Table 1004.5'],['Max travel distance',td+' ft ('+mrud.group+', '+(spr?'sprinklered':'unsprinklered')+')','Table 1017.2'],['Max common path',cp+' ft','§1006.2.1'],['Occupancy separations',groups.length===1?'None required':'Rated horizontal assemblies — see Step 8','§508.4'],['Accessibility','Full ADA 2012 + local overlay','IBC §1101'],['Special inspections','§1705.2, .3, .4, .6, .8, .12, .16, .18','Chapter 17']];document.getElementById('sum-next').innerHTML='1. Confirm sprinkler requirement with local building official and fire marshal.<br>2. Texas: register with TDLR for TAS accessibility review before permit.<br>3. Provide occupant loads and egress distances to architect for life safety plans.<br>4. Provide live load PSF values per floor to structural engineer of record.<br>5. Prepare Special Inspections and Testing Agreement per §1705 for permit package.';}
+  var h='';rows.forEach(function(r){h+='<div class="srow"><span class="slabel">'+r[0]+'</span><span class="sval">'+r[1]+'</span><span class="sibc">'+r[2]+'</span></div>';});document.getElementById('summary-content').innerHTML=h;document.getElementById('summary').style.display='block';
+}
+function completeStep(n){
+  if(n===1&&!isIRC&&state.floors.length===0){alert('Add at least one floor before continuing.');return;}
+  if(n===2&&!isIRC){if(!document.getElementById('ctype').value){alert('Select a construction type before continuing.');return;}state.ctype=document.getElementById('ctype').value;}
+  if(n===4&&!isIRC){state.sprinklers=document.getElementById('spr-choice').value==='yes';}
+  state.completed.push(n);
+  var card=document.getElementById('card-'+n);card.classList.remove('active');card.classList.add('done');document.getElementById('st-'+n).className='sstatus s-done';document.getElementById('st-'+n).textContent='Done';
+  var nx=n+1;
+  if(nx<=10){runStep(nx);var nc=document.getElementById('card-'+nx);nc.classList.add('unlocked','active');document.getElementById('st-'+nx).className='sstatus s-active';document.getElementById('st-'+nx).textContent='In progress';nc.scrollIntoView({behavior:'smooth',block:'start'});document.getElementById('prog-fill').style.width=(nx*10)+'%';document.getElementById('prog-label').textContent='Step '+nx+' of 10';}
+  else{buildSummary();document.getElementById('prog-fill').style.width='100%';document.getElementById('prog-label').textContent='Complete — all 10 steps done';document.getElementById('summary').scrollIntoView({behavior:'smooth',block:'start'});}
+}
+function goBack(n){var card=document.getElementById('card-'+n);card.classList.remove('active','unlocked');document.getElementById('st-'+n).className='sstatus s-locked';document.getElementById('st-'+n).textContent='Locked';var prev=n-1;var pc=document.getElementById('card-'+prev);pc.classList.remove('done');pc.classList.add('active');document.getElementById('st-'+prev).className='sstatus s-active';document.getElementById('st-'+prev).textContent='In progress';state.completed=state.completed.filter(function(x){return x<prev;});document.getElementById('prog-fill').style.width=(prev*10)+'%';document.getElementById('prog-label').textContent='Step '+prev+' of 10';pc.scrollIntoView({behavior:'smooth',block:'start'});}
+function resetWorkbook(){for(var i=1;i<=10;i++){var c=document.getElementById('card-'+i);c.classList.remove('active','done','unlocked');document.getElementById('st-'+i).className='sstatus s-locked';document.getElementById('st-'+i).textContent='Locked';var out=document.getElementById('s'+i+'-out');if(out)out.innerHTML='';}state={floors:[],ctype:'',sprinklers:true,occLoads:[],completed:[]};var ct=document.getElementById('ctype');if(ct)ct.value='';var sc=document.getElementById('spr-choice');if(sc)sc.value='yes';var co=document.getElementById('ctype-out');if(co)co.style.display='none';var sco=document.getElementById('spr-choice-out');if(sco)sco.style.display='none';document.getElementById('summary').style.display='none';document.getElementById('card-1').classList.add('unlocked','active');document.getElementById('st-1').className='sstatus s-active';document.getElementById('st-1').textContent='In progress';document.getElementById('prog-fill').style.width='10%';document.getElementById('prog-label').textContent='Step 1 of 10 — define your project';}
+function restartAll(){document.querySelectorAll('.cp-card').forEach(function(c){c.classList.remove('selected');});document.getElementById('banner-ibc').style.display='none';document.getElementById('banner-irc').style.display='none';document.getElementById('workbook-area').style.display='none';activeCode='';isIRC=false;document.querySelector('.wb').scrollIntoView({behavior:'smooth',block:'start'});}
+
+</script>
+</body>
+</html>
